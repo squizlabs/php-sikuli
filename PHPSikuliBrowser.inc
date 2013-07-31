@@ -98,6 +98,20 @@ class PHPSikuliBrowser extends PHPSikuli
 
 
     /**
+     * Resets the Sikuli connection.
+     *
+     * @return void
+     */
+    public function resetConnection()
+    {
+        parent::resetConnection();
+        $this->_windowSize = NULL;
+        $this->_setBrowser($this->_browserid);
+
+    }//end resetConnection()
+
+
+    /**
      * Reloads the page.
      *
      * @return void
