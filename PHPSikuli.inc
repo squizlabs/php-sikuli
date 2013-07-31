@@ -62,13 +62,6 @@ class PHPSikuli
     private static $_connected = FALSE;
 
     /**
-     * Path to the sikuli app.
-     *
-     * @var string
-     */
-    private $_sikuliPath = '/Applications/Sikuli-IDE.app';
-
-    /**
      * Name of the Operating System the PHP is running on.
      *
      * @var string

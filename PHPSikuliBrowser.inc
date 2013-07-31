@@ -104,10 +104,8 @@ class PHPSikuliBrowser extends PHPSikuli
      */
     public function reloadPage()
     {
-        $this->execJS('clean()');
-        sleep(1);
+        $this->stopJSPolling();
         $this->keyDown('Key.CMD + r');
-        sleep(1);
 
     }//end reloadPage()
 
@@ -172,7 +170,7 @@ class PHPSikuliBrowser extends PHPSikuli
      */
     public function getBoundingRectangle($selector, $index=0)
     {
-        $rect = $this->execJS('gBRec("'.$selector.'", '.$index.')');
+        $rect = $this->execJS('PHPSikuliBrowser.getBoundingRectangle("'.$selector.'", '.$index.')');
         return $rect;
 
     }//end getBoundingRectangle()
@@ -225,7 +223,7 @@ class PHPSikuliBrowser extends PHPSikuli
         file_put_contents($this->_tmpDir.'/jsexec.tmp', $js);
         chmod($this->_tmpDir.'/jsexec.tmp', 0777);
 
-        if ($js === 'cw();' || ($noReturnValue === TRUE && $asynchronous === FALSE)) {
+        if ($noReturnValue === TRUE && $asynchronous === FALSE) {
             return NULL;
         }
 
@@ -259,6 +257,18 @@ class PHPSikuliBrowser extends PHPSikuli
         return $result;
 
     }//end execJS()
+
+
+    /**
+     * Stops the JS polling for commands.
+     *
+     * @return void
+     */
+    public function stopJSPolling()
+    {
+        $this->execJS('PHPSikuliBrowser.stopPolling()');
+
+    }//end stopJSPolling()
 
 
     /**
@@ -358,6 +368,21 @@ class PHPSikuliBrowser extends PHPSikuli
      */
     public function getPageTopLeft()
     {
+        if ($this->_pageTopLeft === NULL) {
+            // Get the JS to display the window-target icon.
+            $this->execJS('PHPSikuliBrowser.showTargetIcon()');
+
+            $targetIcon = $this->find(dirname(__FILE__).'/window-target.png');
+            $topLeft    = $this->getTopLeft($targetIcon);
+            $loc        = array(
+                           'x' => $this->getX($topLeft),
+                           'y' => $this->getY($topLeft),
+                          );
+
+            $this->_pageTopLeft = $loc;
+            $this->execJS('PHPSikuliBrowser.hideTargetIcon()');
+        }
+
         return $this->_pageTopLeft;
 
     }//end getPageTopLeft()
@@ -386,8 +411,6 @@ class PHPSikuliBrowser extends PHPSikuli
             } else if ($appName === 'IE8' || $appName === 'IE9') {
                 $appName = 'Windows Internet Explorer';
             }
-        } else if ($appName === 'Firefox') {
-            $appName = '/Applications/Firefox.app';
         }
 
         $app = $this->switchApp($appName);
@@ -415,35 +438,10 @@ class PHPSikuliBrowser extends PHPSikuli
 
         $this->_browserid = $browser;
 
-        // Set the default region of the find operations.
-        $this->setDefaultRegion($this->_window);
-
-        $this->_updatePageTopLeft();
+        // Resize the browser.
+        $this->resize();
 
     }//end _setBrowser()
-
-
-    /**
-     * Updates the location of the top left corner of the page.
-     *
-     * @return void
-     */
-    private function _updatePageTopLeft()
-    {
-        // Updates the pageTopLeft variable.
-        $calibrationPage = dirname(__FILE__).'/calibrate.html';
-        $this->goToURL($calibrationPage);
-
-        $targetIcon = $this->find(dirname(__FILE__).'/window-target.png');
-        $topLeft    = $this->getTopLeft($targetIcon);
-        $loc        = array(
-                       'x' => $this->getX($topLeft),
-                       'y' => $this->getY($topLeft),
-                      );
-
-        $this->_pageTopLeft = $loc;
-
-    }//end _updatePageTopLeft()
 
 
     /**
@@ -555,6 +553,9 @@ class PHPSikuliBrowser extends PHPSikuli
                               'w' => $w,
                               'h' => $h,
                              );
+
+        // Set the default region of the find operations.
+        $this->setDefaultRegion($this->_window);
 
     }//end resize()
 
