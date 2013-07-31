@@ -1,0 +1,117 @@
+#!/bin/sh
+# Sikuli settings presets
+DEBUG=1
+# other Java settings
+JAVA=X
+PROPS='-Xmx512M -Dfile.encoding=UTF-8'
+
+usage()
+{
+cat << EOF
+usage: $0 options
+OPTIONS:
+           () = default 
+   -h      Show this message
+   -d n    n = debug level (1)
+   -f      logs to SikuliLog.txt in working dir
+   -u      user logs go to UserLog.txt in working dir
+   -j n    n = Java version 6, 7, o (current active version)
+   
+you must specify one of the following options   
+   -r xxx  run this Sikuli script xxx: some.sikuli (abs / rel path)
+   -i      start interactive session (default if no options)
+   
+if you want to pass something to your script
+   --      ends the command script option list - trailing stuff goes to sys.argv
+           a string not starting with a hyphen does the same and is passed too
+--------------------------------------------------------------------------------   
+EOF
+}
+
+while getopts “:hj:d:fuir:” OPTION
+do
+  case $OPTION in
+    h)
+       usage
+       exit 1
+       ;;
+    j)
+       JAVA=$OPTARG
+       ;;
+    d)
+       DEBUG=$OPTARG
+       ;;
+    f)
+       PROPS="$PROPS -Dsikuli.Logfile"
+       ;;
+    u)
+       PROPS="$PROPS -Dsikuli.LogfileUser"
+       ;;
+    i)
+       ARGS=-i
+       ;;
+    r)
+       ARGS=-r 
+       ARGS1="$OPTARG"
+       ;;
+    ?)
+       usage
+       exit 1
+       ;;
+    :)
+       usage
+       exit 1
+       ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+if [ "$ARGS" == ""  ]; then
+   usage
+   exit 1
+fi
+
+if [ "$JAVA" != "X" ]; then
+  echo "being asked to switch to Java "$JAVA
+  if [ "$JAVA" = "6" ]; then
+    echo trying Java 6
+    export JAVA_HOME=`/usr/libexec/java_home -v 1.6`
+  elif [ "$JAVA" = "o" ]; then
+    if [ -e /Library/Java/JavaVirtualMachines/1.7.0u.jdk/Contents/Home ]; then
+      echo trying OpenJDK 7
+      export JAVA_HOME=/Library/Java/JavaVirtualMachines/1.7.0u.jdk/Contents/Home
+    fi
+  elif [ "$JAVA" = "7" ]; then
+    echo trying Java 7
+    export JAVA_HOME=`/usr/libexec/java_home -v 1.7`
+  fi
+fi
+
+if [ "$SIKULIX_HOME" == "" ]; then
+  echo no SIKULIX_HOME specified - looking here  \( `pwd` \)
+  if [ -e "`pwd`/SikuliX" ]; then
+    export SIKULIX_HOME=`pwd`/SikuliX
+  else
+    export SIKULIX_HOME=`pwd`
+  fi 
+fi
+
+if [ ! -e "$SIKULIX_HOME/libs/MadeForMac.txt" ]; then
+  echo SIKULIX_HOME not found or seems to be invalid
+  echo trying parent folder of shell script
+  export SIKULIX_HOME=`dirname $0`
+  if [ ! -e "$SIKULIX_HOME/libs/MadeForMac.txt" ]; then
+    echo SIKULIX_HOME not found or seems to be invalid \( $SIKULIX_HOME \)
+    export SIKULIX_HOME=INVALID 
+    echo giving up
+  fi
+fi
+
+if [ "SIKULIX_HOME" != "INVALID" ]; then
+  echo using as SIKULIX_HOME $SIKULIX_HOME
+  echo seems to be valid - trying to start Sikuli Script
+  echo "running with: $PROPS -Dsikuli.Debug=$DEBUG"
+  echo "-jar $SIKULIX_HOME/sikuli-script.jar $ARGS $ARGS1 $@"
+  java $PROPS -Dsikuli.Debug=$DEBUG -jar "$SIKULIX_HOME/sikuli-script.jar" $ARGS "$ARGS1" $@
+fi  

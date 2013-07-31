@@ -1,0 +1,14 @@
+<?php
+
+if (isset($_POST['res']) === TRUE) {
+    file_put_contents(dirname(__FILE__).'/tmp/jsres.tmp', $_POST['res']);
+} else if (file_exists(dirname(__FILE__).'/tmp/jsexec.tmp') === TRUE) {
+    $jsExecCont = file_get_contents(dirname(__FILE__).'/tmp/jsexec.tmp');
+    unlink(dirname(__FILE__).'/tmp/jsexec.tmp');
+    if ($jsExecCont) {
+        echo $jsExecCont;
+    }
+}
+
+
+?>
