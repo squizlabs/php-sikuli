@@ -436,6 +436,8 @@ class PHPSikuliBrowser extends PHPSikuli
             } else if ($appName === 'IE8' || $appName === 'IE9') {
                 $appName = 'Windows Internet Explorer';
             }
+        } else {
+            $appName = $this->getBrowserName($browser);
         }
 
         $app = $this->switchApp($appName);
@@ -484,11 +486,17 @@ class PHPSikuliBrowser extends PHPSikuli
     /**
      * Returns the name of the current browser.
      *
+     * @param string $browserid Id of the browser.
+     *
      * @return string
      */
-    protected function getBrowserName()
+    protected function getBrowserName($browserid=NULL)
     {
-        return $this->_supportedBrowsers[$this->getBrowserid()];
+        if ($browserid === NULL) {
+            $browserid = $this->getBrowserid();
+        }
+
+        return $this->_supportedBrowsers[$browserid];
 
     }//end getBrowserName()
 
