@@ -104,6 +104,8 @@ class PHPSikuliBrowser extends PHPSikuli
      */
     public function resetConnection()
     {
+        $this->stopJSPolling();
+
         parent::resetConnection();
         $this->_windowSize = NULL;
         $this->_setBrowser($this->_browserid);
@@ -234,12 +236,13 @@ class PHPSikuliBrowser extends PHPSikuli
 
         $this->debug('ExecJS: '.$js);
 
+        clearstatcache();
+        if (file_exists($this->_tmpDir.'/jsres.tmp') === TRUE) {
+            unlink($this->_tmpDir.'/jsres.tmp');
+        }
+
         file_put_contents($this->_tmpDir.'/jsexec.tmp', $js);
         chmod($this->_tmpDir.'/jsexec.tmp', 0777);
-
-        if ($noReturnValue === TRUE && $asynchronous === FALSE) {
-            return NULL;
-        }
 
         $startTime = microtime(TRUE);
         $timeout   = 3;
@@ -281,6 +284,14 @@ class PHPSikuliBrowser extends PHPSikuli
     public function stopJSPolling()
     {
         $this->execJS('PHPSikuliBrowser.stopPolling()');
+
+        if (file_exists($this->_tmpDir.'/jsres.tmp') === TRUE) {
+            unlink($this->_tmpDir.'/jsres.tmp');
+        }
+
+        if (file_exists($this->_tmpDir.'/jsexec.tmp') === TRUE) {
+            unlink($this->_tmpDir.'/jsexec.tmp');
+        }
 
     }//end stopJSPolling()
 
