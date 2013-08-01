@@ -745,17 +745,19 @@ class PHPSikuli
     /**
      * Captures the given region and returns the created image path.
      *
-     * @param string $obj The region object.
+     * @param mixed $psmrl A Pattern, String, Match, Region or Location..
      *
      * @return string
      */
-    public function capture($obj)
+    public function capture($psmrl=array(), $obj=NULL)
     {
-        if (is_array($obj) === FALSE) {
-            $obj = array($obj);
+        if (is_array($psmrl) === FALSE) {
+            $psmrl = array($psmrl);
+        } else if (empty($psmrl) === TRUE) {
+            $psmrl = array('SCREEN.getBounds()', '_noQuotes' => TRUE);
         }
 
-        $imagePath = $this->callFunc('capture', $obj);
+        $imagePath = $this->callFunc('capture', $psmrl, $obj);
         $matches   = array();
         preg_match('#u\'(.+)\'#', $imagePath, $matches);
 
