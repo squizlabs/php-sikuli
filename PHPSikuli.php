@@ -17,56 +17,56 @@ class PHPSikuli
      *
      * @var resource
      */
-    private static $_sikuliHandle = NULL;
+    private $_sikuliHandle = NULL;
 
     /**
      * Sikuli input resource handle.
      *
      * @var resource
      */
-    private static $_sikuliInput = NULL;
+    private $_sikuliInput = NULL;
 
     /**
      * Sikuli output resource handle.
      *
      * @var resource
      */
-    private static $_sikuliOutput = NULL;
+    private $_sikuliOutput = NULL;
 
     /**
      * Sikuli error resource handle.
      *
      * @var resource
      */
-    private static $_sikuliError = NULL;
+    private $_sikuliError = NULL;
 
     /**
      * Sikuli command timeout in seconds.
      *
      * @var integer
      */
-    private static $_sikuliCMDTimeout = 10;
+    private $_sikuliCMDTimeout = 10;
 
     /**
      * Number of variables created.
      *
      * @var resource
      */
-    private static $_varCount = 0;
+    private $_varCount = 0;
 
     /**
      * Set to TRUE when interactive Sikuli Jython session  is created.
      *
      * @var boolean
      */
-    private static $_connected = FALSE;
+    private $_connected = FALSE;
 
     /**
      * Name of the Operating System the PHP is running on.
      *
      * @var string
      */
-    private static $_os = NULL;
+    private $_os = NULL;
 
     /**
      * Default region to use for find commands.
@@ -80,7 +80,7 @@ class PHPSikuli
      *
      * @var boolean
      */
-    private static $_debugging = FALSE;
+    private $_debugging = FALSE;
 
 
     /**
@@ -745,7 +745,8 @@ class PHPSikuli
     /**
      * Captures the given region and returns the created image path.
      *
-     * @param mixed $psmrl A Pattern, String, Match, Region or Location..
+     * @param mixed  $psmrl A Pattern, String, Match, Region or Location..
+     * @param string $obj   The object var name.
      *
      * @return string
      */
@@ -889,7 +890,7 @@ class PHPSikuli
      */
     public function close()
     {
-        fwrite(self::$_sikuliInput, 'exit()'."\n");
+        fwrite($this->_sikuliInput, 'exit()'."\n");
 
     }//end close()
 
@@ -903,11 +904,76 @@ class PHPSikuli
      */
     public function setSikuliCMDTimeout($seconds)
     {
-        $current = self::$_sikuliCMDTimeout;
-        self::$_sikuliCMDTimeout = $seconds;
+        $current = $this->_sikuliCMDTimeout;
+        $this->_sikuliCMDTimeout = $seconds;
         return $current;
 
     }//end setSikuliCMDTimeout()
+
+
+    /**
+     * Add a var to be cached.
+     *
+     * Cached vars are not removed when clearVars() is called.
+     *
+     * @param string $varName The name of the variable to add to cache.
+     *
+     * @return void
+     */
+    public function addCacheVar($varName)
+    {
+        $matches = array();
+        preg_match('#PHPSikuliVars\["(.+)"\]#i', $varName, $matches);
+        $varName = $matches[1];
+
+        $this->_cachedVars[$varName] = $varName;
+
+    }//end addCacheVar()
+
+
+    /**
+     * Remove a cached var.
+     *
+     * @param string $varName The name of the cached variable.
+     *
+     * @return void
+     */
+    public function removeCacheVar($varName)
+    {
+        $matches = array();
+        preg_match('#PHPSikuliVars\["(.+)"\]#i', $varName, $matches);
+        $varName = $matches[1];
+
+        if (isset($this->_cachedVars[$varName]) === TRUE) {
+            unset($this->_cachedVars[$varName]);
+        }
+
+    }//end removeCacheVar()
+
+
+    /**
+     * Clears the variables created in Sikuli.
+     *
+     * Thid method should be called to clear vars that are created by sikuli
+     * when they are no longer needed. If specific variables should be kept
+     * then use the addCacheVar method to prevent them being removed.
+     *
+     * @return void
+     */
+    public function clearVars()
+    {
+        $varToCache = '';
+        $cacheToVar = '';
+        foreach ($this->_cachedVars as $varName) {
+            $varToCache .= 'PHPSikuliVarsCached[\''.$varName.'\'] = PHPSikuliVars[\''.$varName.'\'];';
+            $cacheToVar .= 'PHPSikuliVars[\''.$varName.'\'] = PHPSikuliVarsCached[\''.$varName.'\'];';
+        }
+
+        $cmd = 'PHPSikuliVarsCached = {};'.$varToCache.'PHPSikuliVars = {};'.$cacheToVar;
+        $this->sendCmd(trim($cmd, ';'));
+        $this->_getStreamOutput();
+
+    }//end clearVars()
 
 
     /**
@@ -929,7 +995,7 @@ class PHPSikuli
         $command = '';
         $var     = NULL;
         if ($assignToVar === TRUE) {
-            $var     = 'var_'.(++self::$_varCount);
+            $var     = 'PHPSikuliVars["var_'.(++$this->_varCount).'"]';
             $command = $var.' = ';
         }
 
@@ -954,6 +1020,7 @@ class PHPSikuli
             if ($addQuotes === FALSE
                 || is_numeric($arg) === TRUE
                 || strpos($arg, 'var_') === 0
+                || strpos($arg, 'PHPSikuliVars') === 0
                 || strpos($arg, 'Key.') === 0
             ) {
                 $cmdArgs[] = $arg;
@@ -999,7 +1066,7 @@ class PHPSikuli
 
         // This will allow _getStreamOutput method to stop waiting for more data.
         $command .= ";print '>>>';\n";
-        fwrite(self::$_sikuliInput, $command);
+        fwrite($this->_sikuliInput, $command);
 
         if ($this->getOS() === 'windows') {
             return $this->_getStreamOutput();
@@ -1016,11 +1083,11 @@ class PHPSikuli
      */
     public function connect()
     {
-        if (self::$_connected === TRUE) {
+        if ($this->_connected === TRUE) {
             return;
         }
 
-        self::$_varCount = 0;
+        $this->_varCount = 0;
 
         if ($this->getOS() === 'windows') {
             // TODO: Fix this..
@@ -1034,9 +1101,9 @@ class PHPSikuli
             file_put_contents($sikuliOutputFile, '');
             $sikuliOut = fopen($sikuliOutputFile, 'r');
 
-            self::$_sikuliHandle = $process;
-            self::$_sikuliInput  = $process;
-            self::$_sikuliOutput = $sikuliOut;
+            $this->_sikuliHandle = $process;
+            $this->_sikuliInput  = $process;
+            $this->_sikuliOutput = $sikuliOut;
 
             // Redirect Sikuli output to a file.
             $this->sendCmd('sys.stdout = sys.stderr = open("'.$sikuliOutputFile.'", "w", 1000)');
@@ -1064,21 +1131,24 @@ class PHPSikuli
                 throw new Exception('Failed to connect to Sikuli');
             }
 
-            self::$_sikuliHandle = $process;
-            self::$_sikuliInput  = $pipes[0];
-            self::$_sikuliOutput = $pipes[1];
-            self::$_sikuliError  = $pipes[2];
+            $this->_sikuliHandle = $process;
+            $this->_sikuliInput  = $pipes[0];
+            $this->_sikuliOutput = $pipes[1];
+            $this->_sikuliError  = $pipes[2];
 
             // Dont block reads.
-            stream_set_blocking(self::$_sikuliOutput, 0);
-            stream_set_blocking(self::$_sikuliError, 0);
+            stream_set_blocking($this->_sikuliOutput, 0);
+            stream_set_blocking($this->_sikuliError, 0);
 
             $this->_getStreamOutput();
         }//end if
 
         $this->setSetting('OcrTextSearch', TRUE);
 
-        self::$_connected = TRUE;
+        $this->sendCmd('PHPSikuliVars = {}');
+        $this->_getStreamOutput();
+
+        $this->_connected = TRUE;
 
     }//end connect()
 
@@ -1092,17 +1162,17 @@ class PHPSikuli
     {
         $this->close();
 
-        fclose(self::$_sikuliOutput);
-        fclose(self::$_sikuliInput);
+        fclose($this->_sikuliOutput);
+        fclose($this->_sikuliInput);
 
         if ($this->getOS() === 'windows') {
-            self::$_sikuliHandle = NULL;
+            $this->_sikuliHandle = NULL;
         } else {
-            fclose(self::$_sikuliError);
-            proc_close(self::$_sikuliHandle);
+            fclose($this->_sikuliError);
+            proc_close($this->_sikuliHandle);
         }
 
-        self::$_connected = FALSE;
+        $this->_connected = FALSE;
 
     }//end disconnect()
 
@@ -1127,28 +1197,28 @@ class PHPSikuli
      */
     public function getOS()
     {
-        if (self::$_os === NULL) {
+        if ($this->_os === NULL) {
             $os = strtolower(php_uname('s'));
             switch ($os) {
                 case 'darwin':
-                    self::$_os = 'osx';
+                    $this->_os = 'osx';
                 break;
 
                 case 'linux':
-                    self::$_os = 'linux';
+                    $this->_os = 'linux';
                 break;
 
                 case 'windows nt':
-                    self::$_os = 'windows';
+                    $this->_os = 'windows';
                 break;
 
                 default:
-                    self::$_os = $os;
+                    $this->_os = $os;
                 break;
             }//end switch
         }
 
-        return self::$_os;
+        return $this->_os;
 
     }//end getOS()
 
@@ -1205,14 +1275,14 @@ class PHPSikuli
         }
 
         $isError = FALSE;
-        $timeout = self::$_sikuliCMDTimeout;
+        $timeout = $this->_sikuliCMDTimeout;
         $content = array();
         $start   = microtime(TRUE);
 
         while (TRUE) {
             $read    = array(
-                        self::$_sikuliOutput,
-                        self::$_sikuliError,
+                        $this->_sikuliOutput,
+                        $this->_sikuliError,
                        );
             $write   = array();
             $except  = NULL;
@@ -1220,7 +1290,7 @@ class PHPSikuli
             if ($changed !== FALSE && $changed > 0) {
                 $lines = array();
                 $lines = explode("\n", stream_get_contents($read[0]));
-                if ($isError === FALSE && $read[0] === self::$_sikuliError) {
+                if ($isError === FALSE && $read[0] === $this->_sikuliError) {
                     $content = array();
                     $isError = TRUE;
                 }
@@ -1294,7 +1364,7 @@ class PHPSikuli
      */
     public function debug($content)
     {
-        if (self::$_debugging === TRUE && trim($content) !== '') {
+        if ($this->_debugging === TRUE && trim($content) !== '') {
             echo trim($content)."\n";
             @ob_flush();
         }

@@ -465,6 +465,8 @@ class PHPSikuliBrowser extends PHPSikuli
 
         $this->_browserid = $browser;
 
+        $this->addCacheVar($this->_window);
+
         // Resize the browser.
         $this->resize();
 
@@ -580,7 +582,9 @@ class PHPSikuliBrowser extends PHPSikuli
         $this->dragDrop($bottomRight, $newLocation);
 
         // Update the window object.
+        $this->removeCacheVar($this->_window);
         $this->_window = $this->createRegion($browserX, $browserY, $locX, $locY);
+        $this->addCacheVar($this->_window);
 
         $this->_windowSize = array(
                               'w' => $w,
