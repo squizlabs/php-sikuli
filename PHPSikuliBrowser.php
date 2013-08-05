@@ -492,7 +492,7 @@ class PHPSikuliBrowser extends PHPSikuli
      *
      * @return string
      */
-    protected function getBrowserName($browserid=NULL)
+    public function getBrowserName($browserid=NULL)
     {
         if ($browserid === NULL) {
             $browserid = $this->getBrowserid();
