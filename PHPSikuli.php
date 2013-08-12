@@ -45,7 +45,7 @@ class PHPSikuli
      *
      * @var integer
      */
-    private $_sikuliCMDTimeout = 10;
+    private $_sikuliCMDTimeout = 15;
 
     /**
      * Number of variables created.
@@ -1108,7 +1108,7 @@ class PHPSikuli
             // Redirect Sikuli output to a file.
             $this->sendCmd('sys.stdout = sys.stderr = open("'.$sikuliOutputFile.'", "w", 1000)');
         } else {
-            $cmd = dirname(__FILE__).'/SikuliX/'.$this->getOS().'/sikuli-script -i';
+            $cmd = 'java -jar '.dirname(__FILE__).'/SikuliX/sikuli-script.jar -i';
             $descriptorspec = array(
                                0 => array(
                                      'pipe',

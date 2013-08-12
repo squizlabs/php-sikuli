@@ -1,7 +1,9 @@
 var PHPSikuliBrowser = new function()
 {
-    var _baseURL = null;
     var _pollingInterval = null;
+    var _scriptURL       = '';
+
+    this.pageLoaded = false;
 
     this.init = function()
     {
@@ -13,8 +15,7 @@ var PHPSikuliBrowser = new function()
         for (var i = 0; i < c; i++) {
             if (scripts[i].src) {
                 if (scripts[i].src.match(/\/PHPSikuliBrowser\.js$/)) {
-                    _baseURL  = scripts[i].src.replace(/\/PHPSikuliBrowser\.js$/,'');
-                    scriptURL = _baseURL + '/jspoller.php';
+                    scriptURL  = scripts[i].src.replace(/\/PHPSikuliBrowser\.js$/,'');
                     break;
                 }
             }
@@ -24,6 +25,27 @@ var PHPSikuliBrowser = new function()
             return;
         }
 
+        this.setScriptURL(scriptURL);
+        this.startPolling();
+
+    };
+
+    this.setScriptURL = function(url)
+    {
+        _scriptURL = url;
+        this.stopPolling();
+
+    };
+
+    this.stopPolling = function()
+    {
+        clearInterval(_pollingInterval);
+
+    };
+
+    this.startPolling = function()
+    {
+        var scriptURL    = _scriptURL + '/jspoller.php';
         var pausePolling = false;
         var seconds      = 0.5;
         _pollingInterval = setInterval(function() {
@@ -33,7 +55,7 @@ var PHPSikuliBrowser = new function()
 
             pausePolling = true;
             dfx.post(scriptURL, {_t:(new Date().getTime())}, function(val) {
-                if (!val) {
+                if (!val || val === 'noop') {
                     pausePolling = false;
                     return;
                 }
@@ -59,12 +81,16 @@ var PHPSikuliBrowser = new function()
                 }
             });
         }, (1000 * seconds));
-
     };
 
-    this.stopPolling = function()
+    this.isPageLoaded = function(reset)
     {
-        clearInterval(_pollingInterval);
+        var loaded = this.pageLoaded;
+        if (reset === true) {
+            this.pageLoaded = false;
+        }
+
+        return loaded;
 
     };
 
@@ -83,7 +109,7 @@ var PHPSikuliBrowser = new function()
     {
         var img = document.createElement('img');
         img.id  = 'PHPSikuliBrowser-window-target';
-        img.src = _baseURL + '/window-target.png';
+        img.src = _scriptURL + '/window-target.png';
 
         img.style.position = 'absolute';
         img.style.left     = 0;
@@ -97,7 +123,8 @@ var PHPSikuliBrowser = new function()
     this.hideTargetIcon = function()
     {
         document.body.removeChild(document.getElementById('PHPSikuliBrowser-window-target'));
-    }
+
+    };
 
     this.init();
 
