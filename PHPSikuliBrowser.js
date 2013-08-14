@@ -111,10 +111,10 @@ var PHPSikuliBrowser = new function()
         img.id  = 'PHPSikuliBrowser-window-target';
         img.src = _scriptURL + '/window-target.png';
 
-        img.style.position = 'absolute';
+        img.style.position = 'fixed';
         img.style.left     = 0;
         img.style.top      = 0;
-        img.style.zIndex   = 9999;
+        img.style.zIndex   = 99999;
 
         document.body.appendChild(img);
 

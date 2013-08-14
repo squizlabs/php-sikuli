@@ -70,7 +70,7 @@ class PHPSikuliBrowser extends PHPSikuli
      */
     private $_defaultWindowSize = array(
                                    'w' => 1270,
-                                   'h' => 900,
+                                   'h' => 1100,
                                   );
 
 
@@ -139,6 +139,7 @@ class PHPSikuliBrowser extends PHPSikuli
         $this->keyDown('Key.CMD+l');
         $this->type($url);
         $this->keyDown('Key.ENTER');
+        $this->keyDown('Key.ENTER');
         sleep(1);
 
     }//end goToURL()
@@ -187,6 +188,7 @@ class PHPSikuliBrowser extends PHPSikuli
      */
     public function getBoundingRectangle($selector, $index=0)
     {
+        $selector = addcslashes($selector, '"');
         $rect = $this->execJS('PHPSikuliBrowser.getBoundingRectangle("'.$selector.'", '.$index.')');
         return $rect;
 
@@ -204,8 +206,7 @@ class PHPSikuliBrowser extends PHPSikuli
      */
     public function clickElement($selector, $index=0, $rightClick=FALSE)
     {
-        $elemRect = $this->getBoundingRectangle($selector, $index);
-        $region   = $this->getRegionOnPage($elemRect);
+        $region = $this->getElementRegion($selector, $index);
 
         // Click the element.
         if ($rightClick !== TRUE) {
@@ -215,6 +216,43 @@ class PHPSikuliBrowser extends PHPSikuli
         }
 
     }//end clickElement()
+
+
+    /**
+     * Returns the region object of the element found using the selector.
+     *
+     * @param string  $selector The jQuery selector to use for finding the element.
+     * @param integer $index    The element index of the resulting array.
+     *
+     * @return void
+     */
+    public function getElementRegion($selector, $index=0)
+    {
+        $elemRect = $this->getBoundingRectangle($selector, $index);
+        if ($elemRect === NULL) {
+            throw new Exception('Element: ['.$selector.']('.$index.') not found!');
+        }
+
+        $region = $this->getRegionOnPage($elemRect);
+        return $region;
+
+    }//end getElementRegion()
+
+
+    /**
+     * Returns the HTML contents of the found element.
+     *
+     * @param string  $selector The jQuery selector to use for finding the element.
+     * @param integer $index    The element index of the resulting array.
+     *
+     * @return void
+     */
+    public function getHTML($selector, $index=0)
+    {
+        $html = $this->execJS('dfxjQuery.find("'.$selector.'")['.$index.'].innerHTML');
+        return $html;
+
+    }//end getHTML()
 
 
     /**
