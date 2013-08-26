@@ -224,7 +224,7 @@ class PHPSikuliBrowser extends PHPSikuli
      * @param string  $selector The jQuery selector to use for finding the element.
      * @param integer $index    The element index of the resulting array.
      *
-     * @return void
+     * @return string
      */
     public function getElementRegion($selector, $index=0)
     {
@@ -245,7 +245,7 @@ class PHPSikuliBrowser extends PHPSikuli
      * @param string  $selector The jQuery selector to use for finding the element.
      * @param integer $index    The element index of the resulting array.
      *
-     * @return void
+     * @return string
      */
     public function getHTML($selector, $index=0)
     {
@@ -666,6 +666,22 @@ class PHPSikuliBrowser extends PHPSikuli
         return $size;
 
     }//end getWindowSize()
+
+
+    /**
+     * Print specified message in browser's console.
+     *
+     * @param string $msg  The message to print.
+     * @param string $type The type of the log message.
+     *
+     * @return void
+     */
+    public function log($msg, $type='info')
+    {
+        $msg = str_replace("\n", '\n', addcslashes($msg, '"'));
+        $this->execJS('console.'.$type.'("'.$msg.'")');
+
+    }//end log()
 
 
 }//end class
