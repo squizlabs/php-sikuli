@@ -285,6 +285,37 @@ class PHPSikuli
 
 
     /**
+     * Turns the mouse wheel.
+     *
+     * @param integer $steps Number of steps. A positive value will scroll down
+     *                       and a negative value will scroll up.
+     * @param string  $psmrl A Pattern, String, Match, Region or Location.
+     *
+     * @return void
+     */
+    public function wheel($steps, $psmrl=NULL)
+    {
+        $dir = NULL;
+        if ($steps > 0) {
+            $dir = 'WHEEL_DOWN';
+        } else {
+            $dir = 'WHEEL_UP';
+        }
+
+        $psmrl = $this->_defaultRegion;
+
+        $args = array(
+                 '_noQuotes' => TRUE,
+                 $psmrl,
+                 $dir,
+                 abs($steps),
+                );
+        $this->callFunc('wheel', $args);
+
+    }//end wheel()
+
+
+    /**
      * Returns a valid Sikuli key combination string.
      *
      * @param string $keysStr Keys combination.
@@ -755,7 +786,10 @@ class PHPSikuli
         if (is_array($psmrl) === FALSE) {
             $psmrl = array($psmrl);
         } else if (empty($psmrl) === TRUE) {
-            $psmrl = array('SCREEN.getBounds()', '_noQuotes' => TRUE);
+            $psmrl = array(
+                      'SCREEN.getBounds()',
+                      '_noQuotes' => TRUE,
+                     );
         }
 
         $imagePath = $this->callFunc('capture', $psmrl, $obj);
