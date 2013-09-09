@@ -1177,7 +1177,7 @@ class PHPSikuli
             $this->_getStreamOutput();
         }//end if
 
-        $this->setSetting('OcrTextSearch', TRUE);
+        $this->setSetting('OcrTextSearch', 'True');
 
         $this->sendCmd('PHPSikuliVars = {}');
         $this->_getStreamOutput();
