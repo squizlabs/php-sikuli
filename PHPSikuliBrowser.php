@@ -77,9 +77,10 @@ class PHPSikuliBrowser extends PHPSikuli
     /**
      * Constructor.
      *
-     * @param string $browser The browser to use.
+     * @param string $browser  The browser to use.
+     * @param array  $settings Settings for PHPSikuliBrowser.
      */
-    public function __construct($browser)
+    public function __construct($browser, array $settings=array())
     {
         $this->_tmpDir = dirname(__FILE__).'/tmp';
         if (file_exists($this->_tmpDir) === FALSE) {
@@ -92,6 +93,9 @@ class PHPSikuliBrowser extends PHPSikuli
         chmod($this->_tmpDir, 0777);
 
         parent::__construct();
+
+        $this->_handleSettings($settings);
+
         $this->_setBrowser($browser);
 
     }//end __construct()
@@ -682,6 +686,31 @@ class PHPSikuliBrowser extends PHPSikuli
         $this->execJS('console.'.$type.'("'.$msg.'")');
 
     }//end log()
+
+
+    /**
+     * Sets the given settings.
+     *
+     * @param array $settings The settings for PHPSikuliBrowser.
+     *
+     * @return void
+     */
+    private function _handleSettings(array $settings=array())
+    {
+        foreach ($settings as $setting => $value) {
+            switch ($setting) {
+                case 'size':
+                    if (is_array($value) === TRUE
+                        && isset($value['width']) === TRUE
+                        && isset($value['height']) === TRUE 
+                    ) {
+                        $this->setDefaultWindowSize($value['width'], $value['height']);
+                    }   
+                break;
+            }
+        }
+
+    }//end _handleSettings()
 
 
 }//end class
