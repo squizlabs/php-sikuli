@@ -253,7 +253,7 @@ class PHPSikuliBrowser extends PHPSikuli
      */
     public function getHTML($selector, $index=0)
     {
-        $html = $this->execJS('dfxjQuery.find("'.$selector.'")['.$index.'].innerHTML');
+        $html = $this->execJS('$.find("'.$selector.'")['.$index.'].innerHTML');
         return $html;
 
     }//end getHTML()

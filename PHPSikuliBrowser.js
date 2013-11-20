@@ -54,7 +54,7 @@ var PHPSikuliBrowser = new function()
             }
 
             pausePolling = true;
-            dfx.post(scriptURL, {_t:(new Date().getTime())}, function(val) {
+            $.post(scriptURL, {_t:(new Date().getTime())}, function(val) {
                 if (!val || val === 'noop') {
                     pausePolling = false;
                     return;
@@ -68,12 +68,12 @@ var PHPSikuliBrowser = new function()
 
                 if (async === false) {
                     var jsResult = null;
-                    val = 'try {jsResult = dfx.jsonEncode(' + val + ');} catch (e) {}';
+                    val = 'try {jsResult = JSON.stringify(' + val + ');} catch (e) {}';
 
                     // Execute JS.
                     eval(val);
 
-                    dfx.post(scriptURL, {res: jsResult, _t:(new Date().getTime())}, function() {
+                    $.post(scriptURL, {res: jsResult, _t:(new Date().getTime())}, function() {
                         pausePolling = false;
                     });
                 } else {
@@ -96,11 +96,14 @@ var PHPSikuliBrowser = new function()
 
     this.getBoundingRectangle = function(selector, index)
     {
-        var rect = dfx.getBoundingRectangle(dfxjQuery(selector)[index]);
-        rect.x1 = parseInt(rect.x1);
-        rect.x2 = parseInt(rect.x2);
-        rect.y1 = parseInt(rect.y1);
-        rect.y2 = parseInt(rect.y2);
+        var offset = $($(selector)[index]).offset();
+        var rect   = {
+            x1: parseInt(offset.left),
+            x2: parseInt(offset.top),
+            y1: parseInt(offset.left + $(selector)[index].width),
+            y2: parseInt(offset.top + $(selector)[index].height)
+        };
+
         return rect;
 
     };
