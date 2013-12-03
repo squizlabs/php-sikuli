@@ -5,6 +5,8 @@ var PHPSikuliBrowser = new function()
 
     this.pageLoaded = false;
 
+    var _jQuery = window.$ || window.jQuery || window.dfxjQuery;
+
     this.init = function()
     {
         // Script location.
@@ -54,7 +56,7 @@ var PHPSikuliBrowser = new function()
             }
 
             pausePolling = true;
-            $.post(scriptURL, {_t:(new Date().getTime())}, function(val) {
+            _jQuery.post(scriptURL, {_t:(new Date().getTime())}, function(val) {
                 if (!val || val === 'noop') {
                     pausePolling = false;
                     return;
@@ -73,7 +75,7 @@ var PHPSikuliBrowser = new function()
                     // Execute JS.
                     eval(val);
 
-                    $.post(scriptURL, {res: jsResult, _t:(new Date().getTime())}, function() {
+                    _jQuery.post(scriptURL, {res: jsResult, _t:(new Date().getTime())}, function() {
                         pausePolling = false;
                     });
                 } else {
@@ -96,12 +98,12 @@ var PHPSikuliBrowser = new function()
 
     this.getBoundingRectangle = function(selector, index)
     {
-        var offset = $($(selector)[index]).offset();
+        var offset = _jQuery(_jQuery(selector)[index]).offset();
         var rect   = {
             x1: parseInt(offset.left),
             x2: parseInt(offset.top),
-            y1: parseInt(offset.left + $(selector)[index].width),
-            y2: parseInt(offset.top + $(selector)[index].height)
+            y1: parseInt(offset.left + _jQuery(selector)[index].width),
+            y2: parseInt(offset.top + _jQuery(selector)[index].height)
         };
 
         return rect;
