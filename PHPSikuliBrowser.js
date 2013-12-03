@@ -98,12 +98,13 @@ var PHPSikuliBrowser = new function()
 
     this.getBoundingRectangle = function(selector, index)
     {
-        var offset = _jQuery(_jQuery(selector)[index]).offset();
+        var elem   = _jQuery(selector)[index];
+        var offset = _jQuery(elem).offset();
         var rect   = {
             x1: parseInt(offset.left),
-            x2: parseInt(offset.top),
-            y1: parseInt(offset.left + _jQuery(selector)[index].width),
-            y2: parseInt(offset.top + _jQuery(selector)[index].height)
+            x2: parseInt(offset.left + _jQuery(elem).width()),
+            y1: parseInt(offset.top),
+            y2: parseInt(offset.top + _jQuery(elem).height())
         };
 
         return rect;
