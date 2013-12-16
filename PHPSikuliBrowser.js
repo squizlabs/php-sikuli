@@ -39,6 +39,12 @@ var PHPSikuliBrowser = new function()
 
     };
 
+    this.getScriptURL = function()
+    {
+        return _scriptURL;
+
+    };
+
     this.stopPolling = function()
     {
         clearInterval(_pollingInterval);

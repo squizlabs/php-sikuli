@@ -1322,6 +1322,10 @@ class PHPSikuli
             $except  = NULL;
             $changed = stream_select($read, $write, $except, 0, 100000);
             if ($changed !== FALSE && $changed > 0) {
+                if (isset($read[0]) === false) {
+                    return '';
+                }
+
                 $lines = array();
                 $lines = explode("\n", stream_get_contents($read[0]));
                 if ($isError === FALSE && $read[0] === $this->_sikuliError) {
