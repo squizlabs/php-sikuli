@@ -476,7 +476,7 @@ class PHPSikuliBrowser extends PHPSikuli
                 $appName = '- Google Chrome';
             } else if ($appName === 'Firefox') {
                 $appName = 'Mozilla Firefox';
-            } else if ($appName === 'IE8' || $appName === 'IE9') {
+            } else if ($appName === 'ie8' || $appName === 'ie9') {
                 $appName = 'Windows Internet Explorer';
             }
         } else {
