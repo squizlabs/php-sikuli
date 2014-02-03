@@ -1322,13 +1322,18 @@ class PHPSikuli
             $except  = NULL;
             $changed = stream_select($read, $write, $except, 0, 100000);
             if ($changed !== FALSE && $changed > 0) {
-                if (isset($read[0]) === false) {
-                    return '';
+                $idx = 0;
+                if (isset($read[$idx]) === FALSE) {
+                    if (isset($read[1]) === TRUE) {
+                        $idx = 1;
+                    } else {
+                        throw new Exception('Failed to read from stream');
+                    }
                 }
 
-                $lines = array();
-                $lines = explode("\n", stream_get_contents($read[0]));
-                if ($isError === FALSE && $read[0] === $this->_sikuliError) {
+                $lines = stream_get_contents($read[$idx]);
+                $lines = explode("\n", $lines);
+                if ($isError === FALSE && $read[$idx] === $this->_sikuliError) {
                     $content = array();
                     $isError = TRUE;
                 }
@@ -1411,5 +1416,3 @@ class PHPSikuli
 
 
 }//end class
-
-?>
