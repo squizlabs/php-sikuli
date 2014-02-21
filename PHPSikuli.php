@@ -1123,9 +1123,10 @@ class PHPSikuli
 
         $this->_varCount = 0;
 
+        $sikuliScriptPath = dirname(__FILE__).'/SikuliX/sikuli-script.jar';
+
         if ($this->getOS() === 'windows') {
-            // TODO: Fix this..
-            $cmd     = 'start "PHPSikuli" /B "C:\Program Files\Java\jre7\bin\java.exe" -jar "C:\Program Files\Sikuli X\sikuli-script.jar" -i';
+            $cmd     = 'start "PHPSikuli" /B java -jar "'.$sikuliScriptPath.'" -i';
             $process = popen($cmd, 'w');
             if (is_resource($process) === FALSE) {
                 throw new Exception('Failed to connect to Sikuli');
@@ -1142,7 +1143,7 @@ class PHPSikuli
             // Redirect Sikuli output to a file.
             $this->sendCmd('sys.stdout = sys.stderr = open("'.$sikuliOutputFile.'", "w", 1000)');
         } else {
-            $cmd = 'java -jar '.dirname(__FILE__).'/SikuliX/sikuli-script.jar -i';
+            $cmd = 'java -jar '.$sikuliScriptPath.' -i';
             $descriptorspec = array(
                                0 => array(
                                      'pipe',

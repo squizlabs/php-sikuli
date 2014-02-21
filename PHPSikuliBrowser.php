@@ -61,6 +61,7 @@ class PHPSikuliBrowser extends PHPSikuli
                                    'ie8'     => 'Internet Explorer 8',
                                    'ie9'     => 'Internet Explorer 9',
                                    'ie10'    => 'Internet Explorer 10',
+                                   'ie11'    => 'Internet Explorer 11',
                                   );
 
     /**
@@ -476,8 +477,8 @@ class PHPSikuliBrowser extends PHPSikuli
                 $appName = '- Google Chrome';
             } else if ($appName === 'firefox') {
                 $appName = 'Mozilla Firefox';
-            } else if ($appName === 'ie8' || $appName === 'ie9' || $appName === 'ie10') {
-                $appName = 'Windows Internet Explorer';
+            } else if (strpos($appName, 'ie') === 0) {
+                $appName = 'Internet Explorer';
             }
         } else {
             $appName = $this->getBrowserName($browser);
