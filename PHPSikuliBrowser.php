@@ -74,6 +74,13 @@ class PHPSikuliBrowser extends PHPSikuli
                                    'h' => 1100,
                                   );
 
+    /**
+     * The delay after a mouse click in milliseconds.
+     *
+     * @var integer
+     */
+    private $_clickDelay = 0;
+
 
     /**
      * Constructor.
@@ -194,10 +201,29 @@ class PHPSikuliBrowser extends PHPSikuli
     public function getBoundingRectangle($selector, $index=0)
     {
         $selector = addcslashes($selector, '"');
-        $rect = $this->execJS('PHPSikuliBrowser.getBoundingRectangle("'.$selector.'", '.$index.')');
+        $rect     = $this->execJS('PHPSikuliBrowser.getBoundingRectangle("'.$selector.'", '.$index.')');
         return $rect;
 
     }//end getBoundingRectangle()
+
+
+    /**
+     * Clicks the specified location.
+     *
+     * @param string $psmrl     A Pattern, String, Match, Region or Location.
+     * @param string $modifiers One or more key modifiers.
+     *
+     * @return void
+     */
+    public function click($psmrl, $modifiers=NULL)
+    {
+        parent::click($psmrl, $modifiers);
+
+        if ($this->_clickDelay > 0) {
+            usleep($this->_clickDelay * 1000);
+        }
+
+    }//end click()
 
 
     /**
@@ -674,6 +700,20 @@ class PHPSikuliBrowser extends PHPSikuli
 
 
     /**
+     * Sets the delay in milliseconds after a click.
+     *
+     * @param integer $milSec Delay time in milliseconds.
+     *
+     * @return void
+     */
+    public function setClickDelay($milSec)
+    {
+        $this->_clickDelay = $milSec;
+
+    }//end setClickDelay()
+
+
+    /**
      * Print specified message in browser's console.
      *
      * @param string $msg  The message to print.
@@ -703,10 +743,10 @@ class PHPSikuliBrowser extends PHPSikuli
                 case 'size':
                     if (is_array($value) === TRUE
                         && isset($value['width']) === TRUE
-                        && isset($value['height']) === TRUE 
+                        && isset($value['height']) === TRUE
                     ) {
                         $this->setDefaultWindowSize($value['width'], $value['height']);
-                    }   
+                    }
                 break;
             }
         }
@@ -715,5 +755,3 @@ class PHPSikuliBrowser extends PHPSikuli
 
 
 }//end class
-
-?>
