@@ -108,9 +108,9 @@ var PHPSikuliBrowser = new function()
         var offset = _jQuery(elem).offset();
         var rect   = {
             x1: parseInt(offset.left),
-            x2: parseInt(offset.left + _jQuery(elem).width()),
+            x2: parseInt(offset.left + elem.offsetWidth),
             y1: parseInt(offset.top),
-            y2: parseInt(offset.top + _jQuery(elem).height())
+            y2: parseInt(offset.top + elem.offsetHeight)
         };
 
         return rect;
