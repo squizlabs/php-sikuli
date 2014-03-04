@@ -1270,7 +1270,7 @@ class PHPSikuli
     private function _getStreamOutputWindows()
     {
         $startTime = microtime(TRUE);
-        $timeout   = 10;
+        $timeout   = 15;
         $filePath  = dirname(__FILE__).'/sikuli.out';
 
         while (TRUE) {
