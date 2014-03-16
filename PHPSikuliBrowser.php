@@ -176,13 +176,13 @@ class PHPSikuliBrowser extends PHPSikuli
         $currentTimeout = NULL;
         if ($timeout > 10) {
             $timeout       += 5;
-            $currentTimeout = $this->sikuli->setSikuliCMDTimeout($timeout);
+            $currentTimeout = $this->setSikuliCMDTimeout($timeout);
         }
 
         $result = parent::type($text, $modifiers, $psmrl);
 
         if ($timeout > 10) {
-            $this->sikuli->setSikuliCMDTimeout($currentTimeout);
+            $this->setSikuliCMDTimeout($currentTimeout);
         }
 
         return $result;
