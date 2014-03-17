@@ -632,6 +632,9 @@ class PHPSikuliBrowser extends PHPSikuli
         }
 
         $window = $this->getBrowserWindow();
+        if ($this->getW($window) === $w && $this->getH($window) === $h) {
+            return;
+        }
 
         $bottomRight = $this->getBottomRight($window);
 
@@ -653,7 +656,7 @@ class PHPSikuliBrowser extends PHPSikuli
 
         // Update the window object.
         $this->removeCacheVar($this->_window);
-        $this->_window = $this->createRegion($browserX, $browserY, $locX, $locY);
+        $this->_window = $this->createRegion($browserX, $browserY, $w, $h);
         $this->addCacheVar($this->_window);
 
         $this->_windowSize = array(
