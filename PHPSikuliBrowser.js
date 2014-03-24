@@ -68,25 +68,15 @@ var PHPSikuliBrowser = new function()
                     return;
                 }
 
-                var async = false;
-                if (val.indexOf('__asynchronous__') === 0) {
-                    async = true;
-                    val   = val.replace('__asynchronous__', '');
-                }
+                var jsResult = null;
+                val = 'try {jsResult = JSON.stringify(' + val + ');} catch (e) {}';
 
-                if (async === false) {
-                    var jsResult = null;
-                    val = 'try {jsResult = JSON.stringify(' + val + ');} catch (e) {}';
+                // Execute JS.
+                eval(val);
 
-                    // Execute JS.
-                    eval(val);
-
-                    _jQuery.post(scriptURL, {res: jsResult, _t:(new Date().getTime())}, function() {
-                        pausePolling = false;
-                    });
-                } else {
-                    eval(val);
-                }
+                _jQuery.post(scriptURL, {res: jsResult, _t:(new Date().getTime())}, function() {
+                    pausePolling = false;
+                });
             });
         }, (1000 * seconds));
     };

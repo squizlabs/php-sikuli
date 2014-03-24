@@ -292,18 +292,13 @@ class PHPSikuliBrowser extends PHPSikuli
      * @param string  $js            The JavaScript to execute.
      * @param boolean $noReturnValue If TRUE then JS has no return value and NULL
      *                               will be returned to speed up execution.
-     * @param boolean $asynchronous  If TURE then the JS that is being executed is
-     *                               asynchronous.
+     * @param boolean $raw           If TRUE content will not be modified.
      *
      * @return string
      * @throws Exception If there is a Selenium error.
      */
-    public function execJS($js, $noReturnValue=FALSE, $asynchronous=FALSE)
+    public function execJS($js, $noReturnValue=FALSE, $raw=FALSE)
     {
-        if ($asynchronous === TRUE) {
-            $js = '__asynchronous__'.$js;
-        }
-
         $this->debug('ExecJS: '.$js);
 
         clearstatcache();
@@ -335,7 +330,7 @@ class PHPSikuliBrowser extends PHPSikuli
 
             $result = json_decode($result, TRUE);
 
-            if (is_string($result) === TRUE) {
+            if (is_string($result) === TRUE && $raw !== TRUE) {
                 $result = str_replace("\r\n", '\n', $result);
                 $result = str_replace("\n", '\n', $result);
             }
