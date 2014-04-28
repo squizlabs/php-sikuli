@@ -69,10 +69,7 @@ class PHPSikuliBrowser extends PHPSikuli
      *
      * @var array
      */
-    private $_defaultWindowSize = array(
-                                   'w' => 1270,
-                                   'h' => 1100,
-                                  );
+    private $_defaultWindowSize = NULL;
 
     /**
      * The delay after a mouse click in milliseconds.
@@ -610,6 +607,9 @@ class PHPSikuliBrowser extends PHPSikuli
     {
         if ($w === NULL || $h === NULL) {
             $size = $this->getDefaultWindowSize();
+            if ($size === NULL) {
+                return;
+            }
 
             if ($w === NULL) {
                 $w = $size['w'];
@@ -635,8 +635,8 @@ class PHPSikuliBrowser extends PHPSikuli
 
         if ($this->getOS() === 'windows') {
             $bottomRight = $this->createLocation(
-                ($this->getX($bottomRight) - 5),
-                ($this->getY($bottomRight) - 5)
+                ($this->getX($bottomRight) - 3),
+                ($this->getY($bottomRight) - 3)
             );
         }
 
@@ -644,6 +644,17 @@ class PHPSikuliBrowser extends PHPSikuli
         $browserY = $this->getY($window);
         $locX     = ($browserX + $w);
         $locY     = ($browserY + $h);
+
+        $screenW = $this->getW('SCREEN');
+        $screenH = $this->getH('SCREEN');
+
+        if ($locX > $screenW) {
+            $locX = ($screenW - 5);
+        }
+
+        if ($locY > $screenH) {
+            $locY = ($screenH - 5);
+        }
 
         $newLocation = $this->createLocation($locX, $locY);
 
