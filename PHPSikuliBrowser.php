@@ -55,13 +55,15 @@ class PHPSikuliBrowser extends PHPSikuli
      * @var array
      */
     private $_supportedBrowsers = array(
-                                   'firefox' => 'Firefox',
-                                   'chrome'  => 'Google Chrome',
-                                   'safari'  => 'Safari',
-                                   'ie8'     => 'Internet Explorer 8',
-                                   'ie9'     => 'Internet Explorer 9',
-                                   'ie10'    => 'Internet Explorer 10',
-                                   'ie11'    => 'Internet Explorer 11',
+                                   'firefox'        => 'Firefox',
+                                   'firefoxNightly' => 'Firefox Nightly',
+                                   'chrome'         => 'Google Chrome',
+                                   'chromium'       => 'Google Chromium',
+                                   'safari'         => 'Safari',
+                                   'ie8'            => 'Internet Explorer 8',
+                                   'ie9'            => 'Internet Explorer 9',
+                                   'ie10'           => 'Internet Explorer 10',
+                                   'ie11'           => 'Internet Explorer 11',
                                   );
 
     /**
