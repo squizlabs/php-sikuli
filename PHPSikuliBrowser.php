@@ -93,8 +93,13 @@ class PHPSikuliBrowser extends PHPSikuli
         if (file_exists($this->_tmpDir) === FALSE) {
             mkdir($this->_tmpDir, 0777, TRUE);
         } else {
-            $cmd = 'rm -rf '.$this->_tmpDir.'/*';
-            exec($cmd);
+            // Remove temp files.
+            $files  = glob($this->_tmpDir.'/*.*');
+            foreach($files as $file) {
+                if (is_file($file) === TRUE) {
+                    unlink($file);
+                }
+            }
         }
 
         chmod($this->_tmpDir, 0777);
