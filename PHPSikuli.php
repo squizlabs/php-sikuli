@@ -1126,7 +1126,7 @@ class PHPSikuli
         $sikuliScriptPath = dirname(__FILE__).'/SikuliX/sikuli-script.jar';
 
         if ($this->getOS() === 'windows') {
-            $cmd     = 'start "PHPSikuli" /B java -jar "'.$sikuliScriptPath.'" -i';
+            $cmd     = 'start "PHPSikuli" /B java -Dsikuli.Debug=-2 -jar "'.$sikuliScriptPath.'" -i';
             $process = popen($cmd, 'w');
             if (is_resource($process) === FALSE) {
                 throw new Exception('Failed to connect to Sikuli');

@@ -493,14 +493,22 @@ class PHPSikuliBrowser extends PHPSikuli
 
         $appName = $browser;
         if ($this->getOS() === 'windows') {
-            if ($appName === 'chrome' || $appName === 'chromium') {
-                $appName = '- Google Chrome';
-            } else if ($appName === 'firefox') {
-                $appName = 'Mozilla Firefox';
-            } else if (strpos($appName, 'ie') === 0) {
-                $appName = 'Internet Explorer';
-            } else if ($appName === 'firefoxNightly') {
-                $appName = '- Nightly';
+            switch ($appName) {
+                case 'chrome':
+                case 'chromium':
+                    $appName = 'Chrome';
+                break;
+
+                case 'firefox':
+                case 'firefoxNightly':
+                    $appName = 'Firefox';
+                break;
+
+                default:
+                    if (strpos($appName, 'ie') === 0) {
+                        $appName = 'iexplore';
+                    }
+                break;
             }
         } else {
             $appName = $this->getBrowserName($browser);
@@ -568,6 +576,29 @@ class PHPSikuliBrowser extends PHPSikuli
         return $this->_supportedBrowsers[$browserid];
 
     }//end getBrowserName()
+
+
+    /**
+     * Switches to the specifed application.
+     *
+     * @param string $name The name of the application to switch to.
+     *
+     * @return string
+     */
+    public function switchApp($name)
+    {
+        if ($this->getOS() !== 'windows') {
+            return parent::switchApp($name);
+        }
+
+        $this->keyDown('Key.WIN + r');
+        $this->keyDown('Key.DELETE');
+        $this->type($name.' about:blank');
+        $this->keyDown('Key.ENTER');
+        sleep(2);
+        return $this->callFunc('App.focusedWindow', array(), NULL, TRUE);
+
+    }//end switchApp()
 
 
     /**
