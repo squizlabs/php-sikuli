@@ -94,8 +94,8 @@ class PHPSikuliBrowser extends PHPSikuli
             mkdir($this->_tmpDir, 0777, TRUE);
         } else {
             // Remove temp files.
-            $files  = glob($this->_tmpDir.'/*.*');
-            foreach($files as $file) {
+            $files = glob($this->_tmpDir.'/*.*');
+            foreach ($files as $file) {
                 if (is_file($file) === TRUE) {
                     unlink($file);
                 }
@@ -517,7 +517,7 @@ class PHPSikuliBrowser extends PHPSikuli
             }
         } else {
             $appName = $this->getBrowserName($browser);
-        }
+        }//end if
 
         $app = $this->switchApp($appName);
         if ($this->getOS() !== 'windows') {
@@ -551,6 +551,47 @@ class PHPSikuliBrowser extends PHPSikuli
         $this->resize();
 
     }//end _setBrowser()
+
+
+    /**
+     * Restarts the browser.
+     *
+     * @return void
+     */
+    public function restartBrowser()
+    {
+        switch ($this->getOS()) {
+            case 'osx':
+                // Shutdown browser.
+                $this->keyDown('Key.CMD + q');
+                sleep(1);
+
+                // Start browser.
+                $this->keyDown('Key.CMD + Key.SPACE');
+                $this->type($this->getBrowserName());
+                $this->keyDown('Key.ENTER');
+            break;
+
+            case 'windows':
+                // Shutdown browser.
+                $this->keyDown('Key.ALT + Key.F4');
+
+                // Start browser.
+                $this->keyDown('Key.WIN + r');
+                $this->keyDown('Key.DELETE');
+                $this->type($this->getBrowserName().' about:blank');
+                $this->keyDown('Key.ENTER');
+            break;
+
+            default:
+                // OS not supported.
+            break;
+        }//end switch
+
+        // Wait a few seconds for browser to start.
+        sleep(3);
+
+    }//end restartBrowser()
 
 
     /**

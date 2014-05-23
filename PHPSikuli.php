@@ -1,4 +1,7 @@
 <?php
+require_once 'Exceptions.inc';
+
+
 /**
  * PHPSikuli is a PHP wrapper for Sikuli.
  *
@@ -468,7 +471,7 @@ class PHPSikuli
     public function createPattern($image)
     {
         if (file_exists($image) === FALSE) {
-            throw new Exception('Image does not exist: '.$image);
+            throw new PHPSikuliException('Image file does not exist: '.$image);
         }
 
         $var = $this->callFunc('Pattern', array($image), NULL, TRUE);
@@ -1129,7 +1132,7 @@ class PHPSikuli
             $cmd     = 'start "PHPSikuli" /B java -Dsikuli.Debug=-2 -jar "'.$sikuliScriptPath.'" -i';
             $process = popen($cmd, 'w');
             if (is_resource($process) === FALSE) {
-                throw new Exception('Failed to connect to Sikuli');
+                throw new PHPSikuliException('Failed to connect to Sikuli');
             }
 
             $sikuliOutputFile = dirname(__FILE__).'/sikuli.out';
@@ -1163,7 +1166,7 @@ class PHPSikuli
             $process = proc_open($cmd, $descriptorspec, $pipes);
 
             if (is_resource($process) === FALSE) {
-                throw new Exception('Failed to connect to Sikuli');
+                throw new PHPSikuliException('Failed to connect to Sikuli');
             }
 
             $this->_sikuliHandle = $process;
@@ -1280,7 +1283,7 @@ class PHPSikuli
 
                 if (strpos($contents, 'File "<stdin>"') !== FALSE) {
                     $contents = str_replace("print '>>>';", '', $contents);
-                    throw new Exception('Sikuli Error:'."\n".$contents);
+                    $this->_errorToException($contents);
                 }
 
                 $contents = trim(str_replace('>>>', '', $contents));
@@ -1288,7 +1291,7 @@ class PHPSikuli
             }
 
             if ((microtime(TRUE) - $startTime) > $timeout) {
-                throw new Exception('Sikuli server did not respond');
+                throw new PHPSikuliException('Sikuli server did not respond');
             }
 
             usleep(50000);
@@ -1328,7 +1331,7 @@ class PHPSikuli
                     if (isset($read[1]) === TRUE) {
                         $idx = 1;
                     } else {
-                        throw new Exception('Failed to read from stream');
+                        throw new PHPSikuliException('Failed to read from stream');
                     }
                 }
 
@@ -1375,8 +1378,8 @@ class PHPSikuli
                 if ($isError === TRUE) {
                     break;
                 } else {
-                    $this->debug('Exception: Sikuli server did not respond');
-                    throw new Exception('Sikuli server did not respond');
+                    $this->debug('PHPSikuliException: Sikuli did not respond');
+                    throw new PHPSikuliException('Sikuli did not respond');
                 }
             }
         }//end while
@@ -1388,8 +1391,7 @@ class PHPSikuli
                 $this->resetConnection();
             }
 
-            $this->debug("Sikuli ERROR: \n".$content);
-            throw new Exception("Sikuli ERROR: \n".$content);
+            $this->_errorToException($content);
         }
 
         $this->debug($content);
@@ -1397,6 +1399,25 @@ class PHPSikuli
         return $content;
 
     }//end _getStreamOutput()
+
+
+    /**
+     * Converts Sikuli error to a PHP exception.
+     *
+     * @param string $error The Sikuli Error.
+     *
+     * @return void
+     */
+    private function _errorToException($error)
+    {
+        if (strpos($error, 'org.sikuli.script.FindFailed:') !== FALSE) {
+            throw new FindFailedException($error);
+        }
+
+        $this->debug("Sikuli ERROR: \n".$error);
+        throw new SikuliException("Sikuli ERROR: \n".$error);
+
+    }//end errorToException()
 
 
     /**
