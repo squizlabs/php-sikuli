@@ -579,7 +579,13 @@ class PHPSikuliBrowser extends PHPSikuli
                 // Start browser.
                 $this->keyDown('Key.WIN + r');
                 $this->keyDown('Key.DELETE');
-                $this->type($this->getBrowserName().' about:blank');
+
+                $appName = $this->getBrowserid();
+                if (strpos($appName, 'ie') === 0) {
+                    $appName = 'iexplore';
+                }
+
+                $this->type($appName.' about:blank');
                 $this->keyDown('Key.ENTER');
             break;
 
