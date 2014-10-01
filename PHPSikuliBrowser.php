@@ -366,6 +366,19 @@ class PHPSikuliBrowser extends PHPSikuli
 
 
     /**
+     * Returns the JS errors.
+     *
+     * @return array
+     */
+    public function getJSErrors()
+    {
+        $res = $this->execJS('PHPSikuliBrowser.getJSErrors()');
+        return $res;
+
+    }//end getJSErrors()
+
+
+    /**
      * Returns a new Region object relative to the top left of the test page.
      *
      * @param array $rect The rectangle (x1, y1, x2, y2).

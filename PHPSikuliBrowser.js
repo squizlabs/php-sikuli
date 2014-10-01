@@ -2,10 +2,28 @@ var PHPSikuliBrowser = new function()
 {
     var _pollingInterval = null;
     var _scriptURL       = '';
+    var _jsErrors        = [];
 
     this.pageLoaded = false;
 
     var _jQuery = window.$ || window.jQuery || window.dfxjQuery;
+
+    var errHandler = window.onerror;
+    window.onerror = function (errorMsg, url, lineNumber, column, errorObj)
+    {
+        _jsErrors.push({
+            errorMsg: errorMsg,
+            url: url,
+            lineNumber: lineNumber,
+            column: column,
+            stackTrace: errorObj.stack
+        });
+
+        if (errHandler) {
+            errHandler.apply(this, arguments);
+        }
+
+    };
 
     this.init = function()
     {
@@ -89,6 +107,12 @@ var PHPSikuliBrowser = new function()
         }
 
         return loaded;
+
+    };
+
+    this.getJSErrors = function()
+    {
+        return _jsErrors;
 
     };
 
