@@ -578,7 +578,32 @@ class PHPSikuliBrowser extends PHPSikuli
                 // Shutdown browser.
                 $this->keyDown('Key.CMD + q');
                 sleep(1);
+            break;
 
+            case 'windows':
+                // Shutdown browser.
+                $this->keyDown('Key.ALT + Key.F4');
+            break;
+
+            default:
+                // OS not supported.
+            break;
+        }//end switch
+
+        $this->startBrowser();
+
+    }//end restartBrowser()
+
+
+    /**
+     * Starts the browser.
+     *
+     * @return void
+     */
+    public function startBrowser()
+    {
+        switch ($this->getOS()) {
+            case 'osx':
                 // Start browser.
                 $this->keyDown('Key.CMD + Key.SPACE');
                 $this->type($this->getBrowserName());
@@ -586,9 +611,6 @@ class PHPSikuliBrowser extends PHPSikuli
             break;
 
             case 'windows':
-                // Shutdown browser.
-                $this->keyDown('Key.ALT + Key.F4');
-
                 // Start browser.
                 $this->keyDown('Key.WIN + r');
                 $this->keyDown('Key.DELETE');
@@ -610,7 +632,7 @@ class PHPSikuliBrowser extends PHPSikuli
         // Wait a few seconds for browser to start.
         sleep(3);
 
-    }//end restartBrowser()
+    }//end startBrowser()
 
 
     /**
