@@ -32,7 +32,11 @@ class FindFailedException extends SikuliException
             $msg .= $match[1];
         } else {
             preg_match('/FindFailed: can not find ([^\s]+)/mi', $message, $match);
-            $msg .= $match[1];
+            if (empty($match) === FALSE) {
+                $msg .= $match[1];
+            } else {
+                $msg = $message;
+            }
         }
 
         parent::__construct($msg, $code, $previous);
