@@ -34,8 +34,8 @@ var PHPSikuliBrowser = new function()
         var c         = scripts.length;
         for (var i = 0; i < c; i++) {
             if (scripts[i].src) {
-                if (scripts[i].src.match(/\/PHPSikuliBrowser\.js$/)) {
-                    scriptURL  = scripts[i].src.replace(/\/PHPSikuliBrowser\.js$/,'');
+                if (scripts[i].src.match(/\/PHPSikuliBrowser\.js/)) {
+                    scriptURL  = scripts[i].src.replace(/\/PHPSikuliBrowser\.js.*$/,'');
                     break;
                 }
             }
