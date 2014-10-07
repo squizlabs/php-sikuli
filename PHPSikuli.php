@@ -1,7 +1,6 @@
 <?php
 require_once 'Exceptions.inc';
 
-
 /**
  * PHPSikuli is a PHP wrapper for Sikuli.
  *
@@ -11,7 +10,6 @@ require_once 'Exceptions.inc';
  * @license   https://github.com/squizlabs/php-sikuli/blob/master/licence.txt BSD Licence
  * @link      https://github.com/squizlabs/php-sikuli
  */
-
 class PHPSikuli
 {
 
@@ -124,6 +122,50 @@ class PHPSikuli
         return $var;
 
     }//end find()
+
+
+    /**
+     * Find GUI elements.
+     *
+     * @param string $ps         A Pattern object or Path to an image file or text.
+     * @param string $region     Region or a Match object.
+     * @param float  $similarity The similarity setting.
+     *
+     * @return array
+     */
+    public function findAll($ps, $region=NULL, $similarity=NULL)
+    {
+        if ($region === NULL) {
+            $region = $this->_defaultRegion;
+        } else if ($region < 0) {
+            $region = NULL;
+        }
+
+        if ($similarity !== NULL && file_exists($ps) === TRUE) {
+            // If ps is not a file then ignore this setting.
+            $pattern = $this->createPattern($ps);
+            $pattern = $this->similar($pattern, $similarity);
+            $ps      = $pattern;
+        }
+
+        $foundObjects = array();
+        $match        = $this->callFunc('findAll', array($ps), $region, TRUE);
+
+        do {
+            $var = $this->callFunc('next', array(), $match, TRUE);
+            if (empty($var) === FALSE) {
+                $this->sendCmd('True if '.$var.' is None else False');
+                if ($this->_getStreamOutput() === 'True') {
+                    break;
+                }
+
+                $foundObjects[] = $var;
+            }
+        } while (empty($var) === FALSE);
+
+        return $foundObjects;
+
+    }//end findAll()
 
 
     /**
@@ -466,7 +508,7 @@ class PHPSikuli
      * @param string $image Path to the image.
      *
      * @return string
-     * @throws Exception If the image does not exist.
+     * @throws PHPSikuliException If the image does not exist.
      */
     public function createPattern($image)
     {
@@ -1116,7 +1158,7 @@ class PHPSikuli
      * Creates an interactive Sikuli Jython session from command line.
      *
      * @return void
-     * @throws Exception If cannot connect to Sikuli.
+     * @throws PHPSikuliException If cannot connect to Sikuli.
      */
     public function connect()
     {
@@ -1146,7 +1188,7 @@ class PHPSikuli
             // Redirect Sikuli output to a file.
             $this->sendCmd('sys.stdout = sys.stderr = open("'.$sikuliOutputFile.'", "w", 1000)');
         } else {
-            $cmd = 'java -jar '.$sikuliScriptPath.' -i';
+            $cmd            = 'java -jar '.$sikuliScriptPath.' -i';
             $descriptorspec = array(
                                0 => array(
                                      'pipe',
@@ -1182,7 +1224,6 @@ class PHPSikuli
         }//end if
 
         $this->setSetting('OcrTextSearch', 'True');
-
         $this->sendCmd('PHPSikuliVars = {}');
         $this->_getStreamOutput();
 
@@ -1268,7 +1309,7 @@ class PHPSikuli
      * streams on Windows OS.
      *
      * @return string
-     * @throws Exception If Sikuli server does not respond in time.
+     * @throws PHPSikuliException If Sikuli server does not respond in time.
      */
     private function _getStreamOutputWindows()
     {
@@ -1304,7 +1345,7 @@ class PHPSikuli
      * Returns the output from interactive Sikuli Jython session.
      *
      * @return string
-     * @throws Exception If Sikuli server does not respond in time.
+     * @throws PHPSikuliException If Sikuli server does not respond in time.
      */
     private function _getStreamOutput()
     {
@@ -1344,7 +1385,10 @@ class PHPSikuli
 
                 foreach ($lines as $line) {
                     if (strlen($line) > 0) {
-                        if ($line === '>>>' || $line === '[info] VDictProxy loaded.' || $line === '... use ctrl-d to end the session') {
+                        if ($line === '>>>'
+                            || $line === '[info] VDictProxy loaded.'
+                            || $line === '... use ctrl-d to end the session'
+                        ) {
                             break(2);
                         }
 
@@ -1417,7 +1461,7 @@ class PHPSikuli
         $this->debug("Sikuli ERROR: \n".$error);
         throw new SikuliException("Sikuli ERROR: \n".$error);
 
-    }//end errorToException()
+    }//end _errorToException()
 
 
     /**

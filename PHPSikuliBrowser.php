@@ -743,14 +743,16 @@ class PHPSikuliBrowser extends PHPSikuli
             }
         }
 
+        $window = $this->getBrowserWindow();
         if (is_array($this->_windowSize) === TRUE) {
             if ($this->_windowSize['w'] === $w && $this->_windowSize['h'] === $h) {
+                $this->setDefaultRegion($this->createRegion($this->getX($window), $this->getY($window), $w, $h));
                 return;
             }
         }
 
-        $window = $this->getBrowserWindow();
         if ($this->getW($window) === $w && $this->getH($window) === $h) {
+            $this->setDefaultRegion($this->createRegion($this->getX($window), $this->getY($window), $w, $h));
             return;
         }
 
