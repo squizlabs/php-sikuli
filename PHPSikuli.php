@@ -235,6 +235,24 @@ class PHPSikuli
 
 
     /**
+     * Triple clicks the specified location.
+     *
+     * @param string $psmrl     A Pattern, String, Match, Region or Location.
+     * @param string $modifiers One or more key modifiers.
+     *
+     * @return void
+     */
+    public function tripleClick($psmrl, $modifiers=NULL)
+    {
+        $this->doubleClick($psmrl, $modifiers);
+        usleep(100);
+        $this->mouseDown('Button.LEFT');
+        $this->mouseUp('Button.LEFT');
+
+    }//end tripleClick()
+
+
+    /**
      * Right clicks the specified location.
      *
      * @param string $psmrl     A Pattern, String, Match, Region or Location.
@@ -304,6 +322,34 @@ class PHPSikuli
         $this->callFunc('mouseMove', array($psmrl));
 
     }//end mouseMove()
+
+
+    /**
+     * Press the specified mouse button down.
+     *
+     * @param string $button Button.LEFT, Button.MIDDLE or Button.RIGHT.
+     *
+     * @return void
+     */
+    public function mouseDown($button)
+    {
+        $this->callFunc('mouseDown', array($button, '_noQuotes' => TRUE));
+
+    }//end mouseDown()
+
+
+    /**
+     * Releases the specified mouse button.
+     *
+     * @param string $button If not specified the previous buttons that were pressed are released.
+     *
+     * @return void
+     */
+    public function mouseUp($button=NULL)
+    {
+        $this->callFunc('mouseUp', array($button, '_noQuotes' => TRUE));
+
+    }//end mouseUp()
 
 
     /**
