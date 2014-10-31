@@ -582,7 +582,7 @@ class PHPSikuliBrowser extends PHPSikuli
 
             case 'windows':
                 // Shutdown browser.
-                $this->keyDown('Key.ALT + Key.F4');
+                exec('taskkill /F /IM iexplore.exe');
             break;
 
             default:
