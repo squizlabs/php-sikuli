@@ -91,7 +91,7 @@ class PHPSikuliBrowser extends PHPSikuli
     {
         $this->_tmpDir = dirname(__FILE__).'/tmp';
         if (file_exists($this->_tmpDir) === FALSE) {
-            mkdir($this->_tmpDir, 0777, TRUE);
+            \Libs\FileSystem::mkdir($this->_tmpDir, TRUE);
         } else {
             // Remove temp files.
             $files = glob($this->_tmpDir.'/*.*');
@@ -102,7 +102,7 @@ class PHPSikuliBrowser extends PHPSikuli
             }
         }
 
-        chmod($this->_tmpDir, 0777);
+        chmod($this->_tmpDir, \Libs\FileSystem::getDirectoryMask());
 
         parent::__construct();
 
@@ -311,7 +311,7 @@ class PHPSikuliBrowser extends PHPSikuli
         }
 
         file_put_contents($this->_tmpDir.'/jsexec.tmp', $js);
-        chmod($this->_tmpDir.'/jsexec.tmp', 0777);
+        chmod($this->_tmpDir.'/jsexec.tmp', \Libs\FileSystem::getFileMask());
 
         $startTime = microtime(TRUE);
         $timeout   = 3;
