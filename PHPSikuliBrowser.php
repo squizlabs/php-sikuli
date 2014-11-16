@@ -514,12 +514,12 @@ class PHPSikuliBrowser extends PHPSikuli
             switch ($appName) {
                 case 'chrome':
                 case 'chromium':
-                    $appName = 'Chrome';
+                    $appName = 'chrome';
                 break;
 
                 case 'firefox':
                 case 'firefoxNightly':
-                    $appName = 'Firefox';
+                    $appName = 'firefox';
                 break;
 
                 default:
@@ -528,8 +528,10 @@ class PHPSikuliBrowser extends PHPSikuli
                     }
                 break;
             }
+
+            $this->closeBrowser($appName);
         } else {
-            $appName = $this->getBrowserName($browser);
+            $this->restartBrowser($appName);
         }//end if
 
         $app = $this->switchApp($appName);
@@ -567,22 +569,23 @@ class PHPSikuliBrowser extends PHPSikuli
 
 
     /**
-     * Restarts the browser.
+     * Closes the specified browser or the active browser.
+     *
+     * @param string $browserid Id of the browser to close.
      *
      * @return void
      */
-    public function restartBrowser()
+    public function closeBrowser($browserid=NULL)
     {
         switch ($this->getOS()) {
             case 'osx':
                 // Shutdown browser.
-                $this->keyDown('Key.CMD + q');
-                sleep(1);
+                exec('pkill '.$browserid);
             break;
 
             case 'windows':
                 // Shutdown browser.
-                exec('taskkill /F /IM iexplore.exe');
+                exec('taskkill /F /IM '.$browserid.'.exe');
             break;
 
             default:
@@ -590,7 +593,26 @@ class PHPSikuliBrowser extends PHPSikuli
             break;
         }//end switch
 
-        $this->startBrowser();
+    }//end closeBrowser()
+
+
+    /**
+     * Restarts the browser.
+     *
+     * @param string $browserid Id of the browser to restart.
+     *
+     * @return void
+     */
+    public function restartBrowser($browserid=NULL)
+    {
+        if ($browserid === NULL) {
+            $browserid = $this->getBrowserid();
+        }
+
+        $this->closeBrowser($browserid);
+
+        sleep(1);
+        $this->startBrowser($browserid);
 
     }//end restartBrowser()
 
@@ -598,15 +620,21 @@ class PHPSikuliBrowser extends PHPSikuli
     /**
      * Starts the browser.
      *
+     * @param string $browserid Id of the browser to start.
+     *
      * @return void
      */
-    public function startBrowser()
+    public function startBrowser($browserid=NULL)
     {
+        if ($browserid === NULL) {
+            $browserid = $this->getBrowserid();
+        }
+
         switch ($this->getOS()) {
             case 'osx':
                 // Start browser.
                 $this->keyDown('Key.CMD + Key.SPACE');
-                $this->type($this->getBrowserName());
+                $this->type($browserid);
                 $this->keyDown('Key.ENTER');
             break;
 
@@ -615,12 +643,11 @@ class PHPSikuliBrowser extends PHPSikuli
                 $this->keyDown('Key.WIN + r');
                 $this->keyDown('Key.DELETE');
 
-                $appName = $this->getBrowserid();
-                if (strpos($appName, 'ie') === 0) {
-                    $appName = 'iexplore';
+                if (strpos($browserid, 'ie') === 0) {
+                    $browserid = 'iexplore';
                 }
 
-                $this->type($appName.' about:blank');
+                $this->type($browserid.' about:blank');
                 $this->keyDown('Key.ENTER');
             break;
 
