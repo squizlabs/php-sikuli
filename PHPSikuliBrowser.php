@@ -50,6 +50,13 @@ class PHPSikuliBrowser extends PHPSikuli
     private $_tmpDir = NULL;
 
     /**
+     * Create files and directories with this group.
+     *
+     * @var string
+     */
+    private $_fileGroup = NULL;
+
+    /**
      * List of supported browsers.
      *
      * @var array
@@ -103,6 +110,9 @@ class PHPSikuliBrowser extends PHPSikuli
         }
 
         chmod($this->_tmpDir, 0770);
+        if ($this->_fileGroup !== NULL) {
+            chgrp($this->_tmpDir, $this->_fileGroup);
+        }
 
         parent::__construct();
 
@@ -312,6 +322,9 @@ class PHPSikuliBrowser extends PHPSikuli
 
         file_put_contents($this->_tmpDir.'/jsexec.tmp', $js);
         chmod($this->_tmpDir.'/jsexec.tmp', 0660);
+        if ($this->_fileGroup !== NULL) {
+            chgrp($this->_tmpDir.'/jsexec.tmp', $this->_fileGroup);
+        }
 
         $startTime = microtime(TRUE);
         $timeout   = 3;
@@ -872,6 +885,20 @@ class PHPSikuliBrowser extends PHPSikuli
         $this->_clickDelay = $milSec;
 
     }//end setClickDelay()
+
+
+    /**
+     * Sets the file group setting.
+     *
+     * @param string $group The group name.
+     *
+     * @return void
+     */
+    public function setFileGroup($group)
+    {
+        $this->_fileGroup = $group;
+
+    }//end setFileGroup()
 
 
     /**
