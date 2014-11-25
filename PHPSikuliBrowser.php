@@ -593,7 +593,7 @@ class PHPSikuliBrowser extends PHPSikuli
         switch ($this->getOS()) {
             case 'osx':
                 // Shutdown browser.
-                exec('pkill '.$browserid);
+                exec('pkill -i '.$browserid);
             break;
 
             case 'windows':
