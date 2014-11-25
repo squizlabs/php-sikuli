@@ -109,14 +109,14 @@ class PHPSikuliBrowser extends PHPSikuli
             }
         }
 
+        $this->_handleSettings($settings);
+
         chmod($this->_tmpDir, 0770);
         if ($this->_fileGroup !== NULL) {
             chgrp($this->_tmpDir, $this->_fileGroup);
         }
 
         parent::__construct();
-
-        $this->_handleSettings($settings);
 
         $this->_setBrowser($browser);
 
@@ -936,6 +936,10 @@ class PHPSikuliBrowser extends PHPSikuli
                     ) {
                         $this->setDefaultWindowSize($value['width'], $value['height']);
                     }
+                break;
+
+                case 'fileGroupOwner':
+                    $this->setFileGroup($value);
                 break;
             }
         }
