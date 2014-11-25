@@ -545,6 +545,7 @@ class PHPSikuliBrowser extends PHPSikuli
             $this->closeBrowser($appName);
         } else {
             $this->restartBrowser($appName);
+            $appName = $this->getBrowserName($browser);
         }//end if
 
         $app = $this->switchApp($appName);
