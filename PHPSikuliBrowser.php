@@ -66,6 +66,7 @@ class PHPSikuliBrowser extends PHPSikuli
                                    'firefoxNightly' => 'FirefoxNightly',
                                    'chrome'         => 'Google Chrome',
                                    'chromium'       => 'Chromium',
+                                   'chromeCanary'   => 'Google Chrome Canary',
                                    'safari'         => 'Safari',
                                    'ie8'            => 'Internet Explorer 8',
                                    'ie9'            => 'Internet Explorer 9',
@@ -527,6 +528,7 @@ class PHPSikuliBrowser extends PHPSikuli
             switch ($appName) {
                 case 'chrome':
                 case 'chromium':
+                case 'chromeCanary':
                     $appName = 'chrome';
                 break;
 
@@ -554,6 +556,7 @@ class PHPSikuliBrowser extends PHPSikuli
             switch ($appName) {
                 case 'Google Chrome':
                 case 'Chromium':
+                case 'Google Chrome Canary':
                     $windowNum = 1;
                 break;
 
