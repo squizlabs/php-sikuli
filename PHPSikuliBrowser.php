@@ -208,15 +208,23 @@ class PHPSikuliBrowser extends PHPSikuli
     /**
      * Returns the rectangle for a DOM element found using the specified selector.
      *
-     * @param string  $selector The jQuery selector to use for finding the element.
-     * @param integer $index    The element index of the resulting array.
+     * @param string  $selector          The jQuery selector to use for finding the element.
+     * @param integer $index             The element index of the resulting array.
+     * @param boolean $fallbackToVisible If set to true and the element at given index is not visible then the first
+     *                                   visible element of the selector is returned.
      *
      * @return array
      */
-    public function getBoundingRectangle($selector, $index=0)
+    public function getBoundingRectangle($selector, $index=0, $fallbackToVisible=false)
     {
+        if ($fallbackToVisible === true) {
+            $fallbackToVisible = 'true';
+        } else {
+            $fallbackToVisible = 'false';
+        }
+
         $selector = addcslashes($selector, '"');
-        $rect     = $this->execJS('PHPSikuliBrowser.getBoundingRectangle("'.$selector.'", '.$index.')');
+        $rect     = $this->execJS('PHPSikuliBrowser.getBoundingRectangle("'.$selector.'", '.$index.', '.$fallbackToVisible.')');
         return $rect;
 
     }//end getBoundingRectangle()
@@ -265,16 +273,42 @@ class PHPSikuliBrowser extends PHPSikuli
 
 
     /**
+     * Clicks an element in the content.
+     *
+     * Only the first visible element will be clicked.
+     *
+     * @param string  $selector   The jQuery selector to use for finding the element.
+     * @param boolean $rightClick If TRUE then right mouse button is used.
+     *
+     * @return void
+     */
+    public function clickVisibleElement($selector, $rightClick=FALSE)
+    {
+        $region = $this->getElementRegion($selector, 0, true);
+
+        // Click the element.
+        if ($rightClick !== TRUE) {
+            $this->click($region);
+        } else {
+            $this->rightClick($region);
+        }
+
+    }//end clickVisibleElement()
+
+
+    /**
      * Returns the region object of the element found using the selector.
      *
-     * @param string  $selector The jQuery selector to use for finding the element.
-     * @param integer $index    The element index of the resulting array.
+     * @param string  $selector          The jQuery selector to use for finding the element.
+     * @param integer $index             The element index of the resulting array.
+     * @param boolean $fallbackToVisible If set to true and the element at given index is not visible then the first
+     *                                   visible element of the selector is returned.
      *
      * @return string
      */
-    public function getElementRegion($selector, $index=0)
+    public function getElementRegion($selector, $index=0, $fallbackToVisible=false)
     {
-        $elemRect = $this->getBoundingRectangle($selector, $index);
+        $elemRect = $this->getBoundingRectangle($selector, $index, $fallbackToVisible);
         if ($elemRect === NULL) {
             throw new Exception('Element: ['.$selector.']('.$index.') not found!');
         }

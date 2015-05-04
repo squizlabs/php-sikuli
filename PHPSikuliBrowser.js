@@ -116,7 +116,7 @@ var PHPSikuliBrowser = new function()
 
     };
 
-    this.getBoundingRectangle = function(selector, index)
+    this.getBoundingRectangle = function(selector, index, fallbackToVisible)
     {
         var elem   = _jQuery(selector)[index];
         var offset = _jQuery(elem).offset();
@@ -126,6 +126,30 @@ var PHPSikuliBrowser = new function()
             y1: parseInt(offset.top),
             y2: parseInt(offset.top + elem.offsetHeight)
         };
+
+        if (fallbackToVisible === true
+            && (rect.x1 === rect.x2
+            || rect.y1 === rect.y2)
+        ) {
+            rect       = null;
+            var elems  = _jQuery(selector);
+            for (var i = 0; i < elems.length; i++) {
+                var offset  = _jQuery(elems[i]).offset();
+                var tmpRect = {
+                    x1: parseInt(offset.left),
+                    x2: parseInt(offset.left + elems[i].offsetWidth),
+                    y1: parseInt(offset.top),
+                    y2: parseInt(offset.top + elems[i].offsetHeight)
+                };
+
+                if (tmpRect.x1 !== tmpRect.x2 && tmpRect.y1 !== tmpRect.y2) {
+                    rect = tmpRect;
+                    break;
+                }
+            }
+
+
+        }
 
         return rect;
 
