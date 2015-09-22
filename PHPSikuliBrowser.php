@@ -72,6 +72,7 @@ class PHPSikuliBrowser extends PHPSikuli
                                    'ie9'            => 'Internet Explorer 9',
                                    'ie10'           => 'Internet Explorer 10',
                                    'ie11'           => 'Internet Explorer 11',
+                                   'edge'           => 'Edge',
                                   );
 
     /**
@@ -691,11 +692,16 @@ class PHPSikuliBrowser extends PHPSikuli
 
             case 'windows':
                 // Start browser.
-                $this->keyDown('Key.WIN + r');
-                $this->keyDown('Key.DELETE');
+                if ($browserid === 'edge') {
+                    $this->keyDown('Key.WIN');
+                } else {
+                    // Start browser.
+                    $this->keyDown('Key.WIN + r');
+                    $this->keyDown('Key.DELETE');
 
-                if (strpos($browserid, 'ie') === 0) {
-                    $browserid = 'iexplore';
+                    if (strpos($browserid, 'ie') === 0) {
+                      $browserid = 'iexplore';
+                    }
                 }
 
                 $this->type($browserid.' about:blank');
@@ -754,6 +760,11 @@ class PHPSikuliBrowser extends PHPSikuli
     {
         if ($this->getOS() !== 'windows') {
             return parent::switchApp($name);
+        } else if ($name === 'edge') {
+            $this->keyDown('Key.WIN');
+        } else {
+            $this->keyDown('Key.WIN + r');
+            $this->keyDown('Key.DELETE');
         }
 
         $this->keyDown('Key.WIN + r');
