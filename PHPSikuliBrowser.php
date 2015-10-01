@@ -636,8 +636,15 @@ class PHPSikuliBrowser extends PHPSikuli
             break;
 
             case 'windows':
+                $taskName = $browserid;
+                if ($browserid === 'edge') {
+                    $taskName = 'MicrosoftEdge';
+                } else if (strpos($browserid, 'ie') === 0) {
+                    $taskName = 'iexplore';
+                }
+
                 // Shutdown browser.
-                exec('taskkill /F /IM '.$browserid.'.exe');
+                exec('taskkill /F /IM '.$taskName.'.exe');
             break;
 
             default:
@@ -767,8 +774,6 @@ class PHPSikuliBrowser extends PHPSikuli
             $this->keyDown('Key.DELETE');
         }
 
-        $this->keyDown('Key.WIN + r');
-        $this->keyDown('Key.DELETE');
         $this->type($name.' about:blank');
         $this->keyDown('Key.ENTER');
         sleep(2);
