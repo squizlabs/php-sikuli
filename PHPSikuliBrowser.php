@@ -167,7 +167,6 @@ class PHPSikuliBrowser extends PHPSikuli
         $this->keyDown('Key.CMD+l');
         $this->type($url);
         $this->keyDown('Key.ENTER');
-        $this->keyDown('Key.ENTER');
         sleep(1);
 
     }//end goToURL()
