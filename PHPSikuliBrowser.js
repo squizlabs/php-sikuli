@@ -92,7 +92,7 @@ var PHPSikuliBrowser = new function()
                 // Execute JS.
                 eval(val);
 
-                _jQuery.post(scriptURL, {res: jsResult, _t:(new Date().getTime())}, function() {
+                _jQuery.post(scriptURL, {res: 'result:' + jsResult, _t:(new Date().getTime())}, function() {
                     pausePolling = false;
                 });
             });

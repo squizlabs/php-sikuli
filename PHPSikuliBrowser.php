@@ -361,10 +361,16 @@ class PHPSikuliBrowser extends PHPSikuli
             chgrp($this->_tmpDir.'/jsexec.tmp', $this->_fileGroup);
         }
 
+        if ($noReturnValue === TRUE) {
+            return NULL;
+        }
+
         $startTime = microtime(TRUE);
-        $timeout   = 3;
+        $timeout   = 5;
         while (file_exists($this->_tmpDir.'/jsres.tmp') === FALSE) {
             if ((microtime(TRUE) - $startTime) > $timeout) {
+                $this->restartBrowser();
+                throw new Exception('Browser is not responding!');
                 break;
             }
 
@@ -400,7 +406,7 @@ class PHPSikuliBrowser extends PHPSikuli
      */
     public function stopJSPolling()
     {
-        $this->execJS('PHPSikuliBrowser.stopPolling()');
+        $this->execJS('PHPSikuliBrowser.stopPolling()', TRUE);
 
         if (file_exists($this->_tmpDir.'/jsres.tmp') === TRUE) {
             unlink($this->_tmpDir.'/jsres.tmp');
