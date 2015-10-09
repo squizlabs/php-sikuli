@@ -366,7 +366,7 @@ class PHPSikuliBrowser extends PHPSikuli
         }
 
         $startTime = microtime(TRUE);
-        $timeout   = 5;
+        $timeout   = 3;
         while (file_exists($this->_tmpDir.'/jsres.tmp') === FALSE) {
             if ((microtime(TRUE) - $startTime) > $timeout) {
                 $this->restartBrowser();
