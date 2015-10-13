@@ -426,7 +426,7 @@ class PHPSikuliBrowser extends PHPSikuli
      */
     public function getJSErrors()
     {
-        $res = $this->execJS('PHPSikuliBrowser.getJSErrors()');
+        $res = $this->execJS('PHPSikuliBrowser.getJSErrors()', TRUE);
         return $res;
 
     }//end getJSErrors()
@@ -531,7 +531,7 @@ class PHPSikuliBrowser extends PHPSikuli
     {
         if ($this->_pageTopLeft === NULL) {
             // Get the JS to display the window-target icon.
-            $this->execJS('PHPSikuliBrowser.showTargetIcon()');
+            $this->execJS('PHPSikuliBrowser.showTargetIcon()', TRUE);
 
             $targetIcon = $this->find(dirname(__FILE__).'/window-target.png');
             $topLeft    = $this->getTopLeft($targetIcon);
@@ -541,7 +541,7 @@ class PHPSikuliBrowser extends PHPSikuli
                           );
 
             $this->_pageTopLeft = $loc;
-            $this->execJS('PHPSikuliBrowser.hideTargetIcon()');
+            $this->execJS('PHPSikuliBrowser.hideTargetIcon()', TRUE);
         }
 
         return $this->_pageTopLeft;
