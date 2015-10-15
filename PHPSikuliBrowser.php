@@ -224,7 +224,7 @@ class PHPSikuliBrowser extends PHPSikuli
         }
 
         $selector = addcslashes($selector, '"');
-        $rect     = $this->execJS('PHPSikuliBrowser.getBoundingRectangle("'.$selector.'", '.$index.', '.$fallbackToVisible.')');
+        $rect     = $this->execJS('PHPSikuliBrowser.getBoundingRectangle("'.$selector.'", '.$index.', '.$fallbackToVisible.')', FALSE);
         return $rect;
 
     }//end getBoundingRectangle()
@@ -361,8 +361,8 @@ class PHPSikuliBrowser extends PHPSikuli
             chgrp($this->_tmpDir.'/jsexec.tmp', $this->_fileGroup);
         }
 
-        if (strpos($js, 'PHPSikuliBrowser.') === 0) {
-            sleep(1);
+        if ($noReturnValue === TRUE) {
+            usleep(700000);
             return NULL;
         }
 
@@ -427,7 +427,7 @@ class PHPSikuliBrowser extends PHPSikuli
      */
     public function getJSErrors()
     {
-        $res = $this->execJS('PHPSikuliBrowser.getJSErrors()', TRUE);
+        $res = $this->execJS('PHPSikuliBrowser.getJSErrors()', FALSE);
         return $res;
 
     }//end getJSErrors()
@@ -532,7 +532,7 @@ class PHPSikuliBrowser extends PHPSikuli
     {
         if ($this->_pageTopLeft === NULL) {
             // Get the JS to display the window-target icon.
-            $this->execJS('PHPSikuliBrowser.showTargetIcon()', TRUE);
+            $this->execJS('PHPSikuliBrowser.showTargetIcon()', FALSE);
 
             $targetIcon = $this->find(dirname(__FILE__).'/window-target.png');
             $topLeft    = $this->getTopLeft($targetIcon);
@@ -972,7 +972,7 @@ class PHPSikuliBrowser extends PHPSikuli
     public function log($msg, $type='info')
     {
         $msg = str_replace("\n", '\n', addcslashes($msg, '"'));
-        $this->execJS('console.'.$type.'("'.$msg.'")');
+        $this->execJS('console.'.$type.'("'.$msg.'")', TRUE);
 
     }//end log()
 
