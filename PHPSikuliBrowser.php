@@ -361,10 +361,6 @@ class PHPSikuliBrowser extends PHPSikuli
             chgrp($this->_tmpDir.'/jsexec.tmp', $this->_fileGroup);
         }
 
-        if ($noReturnValue === TRUE) {
-            return NULL;
-        }
-
         $startTime = microtime(TRUE);
         $timeout   = 3;
         while (file_exists($this->_tmpDir.'/jsres.tmp') === FALSE) {
