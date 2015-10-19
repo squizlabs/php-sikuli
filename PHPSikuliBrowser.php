@@ -186,11 +186,11 @@ class PHPSikuliBrowser extends PHPSikuli
         // We may need to increase the timeout when typing. It takes about 5s to
         // type 100 characters.
         $length  = strlen($text);
-        $timeout = (int) (($length * 5) / 100);
+        $timeout = (int) (($length * 8) / 100);
 
         $currentTimeout = NULL;
         if ($timeout > 10) {
-            $timeout       += 5;
+            $timeout       += 8;
             $currentTimeout = $this->setSikuliCMDTimeout($timeout);
         }
 
