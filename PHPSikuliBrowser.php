@@ -148,6 +148,7 @@ class PHPSikuliBrowser extends PHPSikuli
      */
     public function reloadPage()
     {
+        $this->_pageTopLeft = NULL;
         $this->stopJSPolling();
         $this->keyDown('Key.CMD + r');
 
@@ -370,9 +371,7 @@ class PHPSikuliBrowser extends PHPSikuli
         $timeout   = 3;
         while (file_exists($this->_tmpDir.'/jsres.tmp') === FALSE) {
             if ((microtime(TRUE) - $startTime) > $timeout) {
-                $this->restartBrowser();
                 throw new Exception('Browser is not responding!');
-                break;
             }
 
             usleep(50000);
@@ -678,7 +677,7 @@ class PHPSikuliBrowser extends PHPSikuli
 
         $this->closeBrowser($browserid);
 
-        sleep(1);
+        sleep(3);
         $this->startBrowser($browserid);
 
     }//end restartBrowser()
@@ -729,7 +728,10 @@ class PHPSikuliBrowser extends PHPSikuli
         }//end switch
 
         // Wait a few seconds for browser to start.
-        sleep(3);
+        sleep(2);
+
+        $this->keyDown('Key.ENTER');
+        sleep(2);
 
     }//end startBrowser()
 
