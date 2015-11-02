@@ -622,6 +622,9 @@ class PHPSikuliBrowser extends PHPSikuli
         // Resize the browser.
         $this->resize();
 
+        // Reset zoom.
+        $this->keyDown('Key.CMD + 0');
+
     }//end _setBrowser()
 
 
