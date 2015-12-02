@@ -710,7 +710,8 @@ class PHPSikuliBrowser extends PHPSikuli
             case 'windows':
                 // Start browser.
                 if ($browserid === 'edge') {
-                    $this->keyDown('Key.WIN');
+                    $this->keyDown('Key.WIN + r');
+                    $this->type('microsoft-edge://');
                 } else {
                     // Start browser.
                     $this->keyDown('Key.WIN + r');
@@ -719,9 +720,10 @@ class PHPSikuliBrowser extends PHPSikuli
                     if (strpos($browserid, 'ie') === 0) {
                       $browserid = 'iexplore';
                     }
+
+                    $this->type($browserid.' about:blank');
                 }
 
-                $this->type($browserid.' about:blank');
                 $this->keyDown('Key.ENTER');
             break;
 
@@ -781,13 +783,14 @@ class PHPSikuliBrowser extends PHPSikuli
         if ($this->getOS() !== 'windows') {
             return parent::switchApp($name);
         } else if ($name === 'edge') {
-            $this->keyDown('Key.WIN');
+            $this->keyDown('Key.WIN + r');
+            $this->type('microsoft-edge://');
         } else {
             $this->keyDown('Key.WIN + r');
             $this->keyDown('Key.DELETE');
+            $this->type($name.' about:blank');
         }
 
-        $this->type($name.' about:blank');
         $this->keyDown('Key.ENTER');
         sleep(2);
         return $this->callFunc('App.focusedWindow', array(), NULL, TRUE);
