@@ -356,7 +356,15 @@ class PHPSikuliBrowser extends PHPSikuli
             unlink($this->_tmpDir.'/jsres.tmp');
         }
 
-        file_put_contents($this->_tmpDir.'/jsexec.tmp', $js);
+        $maxTry = 10;
+        do {
+            if (file_put_contents($this->_tmpDir.'/jsexec.tmp', $js, LOCK_EX) !== FALSE) {
+                break;
+            }
+
+            usleep(50000);
+        } while ($maxTry-- > 0);
+
         chmod($this->_tmpDir.'/jsexec.tmp', 0660);
         if ($this->_fileGroup !== NULL) {
             chgrp($this->_tmpDir.'/jsexec.tmp', $this->_fileGroup);
