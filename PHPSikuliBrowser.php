@@ -371,7 +371,7 @@ class PHPSikuliBrowser extends PHPSikuli
         }
 
         if ($noReturnValue === TRUE) {
-            usleep(700000);
+            usleep(500000);
             return NULL;
         }
 
@@ -385,21 +385,18 @@ class PHPSikuliBrowser extends PHPSikuli
             usleep(50000);
         }
 
-        $result = NULL;
-        if (file_exists($this->_tmpDir.'/jsres.tmp') === TRUE) {
-            $result = file_get_contents($this->_tmpDir.'/jsres.tmp');
-            unlink($this->_tmpDir.'/jsres.tmp');
+        $result = file_get_contents($this->_tmpDir.'/jsres.tmp');
+        unlink($this->_tmpDir.'/jsres.tmp');
 
-            if ($result === 'undefined' || trim($result) === '') {
-                return NULL;
-            }
+        if ($result === 'undefined' || trim($result) === '') {
+            return NULL;
+        }
 
-            $result = json_decode($result, TRUE);
+        $result = json_decode($result, TRUE);
 
-            if (is_string($result) === TRUE && $raw !== TRUE) {
-                $result = str_replace("\r\n", '\n', $result);
-                $result = str_replace("\n", '\n', $result);
-            }
+        if (is_string($result) === TRUE && $raw !== TRUE) {
+            $result = str_replace("\r\n", '\n', $result);
+            $result = str_replace("\n", '\n', $result);
         }
 
         return $result;
