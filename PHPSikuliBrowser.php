@@ -89,6 +89,13 @@ class PHPSikuliBrowser extends PHPSikuli
      */
     private $_clickDelay = 0;
 
+    /**
+     * Default position of the browser window.
+     *
+     * @var array
+     */
+    private $_defaultWindowPosition = NULL;
+
 
     /**
      * Constructor.
@@ -568,6 +575,82 @@ class PHPSikuliBrowser extends PHPSikuli
             throw new Exception('Browser is not supported');
         }
 
+        $appName = $this->_getAppName($browser);
+        if ($this->getOS() === 'windows') {
+            $this->closeBrowser($appName);
+        } else {
+            $this->restartBrowser($appName);
+        }
+
+        $this->_window = $this->_getBrowserWindow($browser);
+
+        $this->_browserid = $browser;
+
+        $this->addCacheVar($this->_window);
+
+        // Position the browser.
+        $this->position();
+
+        // Resize the browser.
+        $this->resize();
+
+        // Reset zoom.
+        $this->keyDown('Key.CMD + 0');
+
+    }//end _setBrowser()
+
+
+    /**
+     * Returns the window object of the current browser.
+     *
+     * @param string $browser A valid browser id (E.g. firefox).
+     *
+     * @return Object
+     */
+    private function _getBrowserWindow($browser)
+    {
+        $appName = $this->_getAppName($browser);
+
+        $win = null;
+        $app = $this->switchApp($appName);
+        if ($this->getOS() !== 'windows') {
+            $windowNum = 0;
+            switch ($appName) {
+                case 'Google Chrome':
+                case 'Chromium':
+                case 'Google Chrome Canary':
+                    $windowNum = 1;
+                break;
+
+                default:
+                    $windowNum = 0;
+                break;
+            }
+
+            $win = $this->callFunc(
+                'window',
+                array($windowNum),
+                $app,
+                TRUE
+            );
+        } else {
+            $win = $app;
+        }//end if
+
+        return $win;
+
+    }//end _getBrowserWindow()
+
+
+    /**
+     * Returns the browsers application name.
+     *
+     * @param string $browser A valid browser id (E.g. firefox).
+     *
+     * @return string
+     */
+    private function _getAppName($browser)
+    {
         $appName = $browser;
         if ($this->getOS() === 'windows') {
             switch ($appName) {
@@ -588,49 +671,13 @@ class PHPSikuliBrowser extends PHPSikuli
                     }
                 break;
             }
-
-            $this->closeBrowser($appName);
         } else {
-            $this->restartBrowser($appName);
             $appName = $this->getBrowserName($browser);
         }//end if
 
-        $app = $this->switchApp($appName);
-        if ($this->getOS() !== 'windows') {
-            $windowNum = 0;
-            switch ($appName) {
-                case 'Google Chrome':
-                case 'Chromium':
-                case 'Google Chrome Canary':
-                    $windowNum = 1;
-                break;
+        return $appName;
 
-                default:
-                    $windowNum = 0;
-                break;
-            }
-
-            $this->_window = $this->callFunc(
-                'window',
-                array($windowNum),
-                $app,
-                TRUE
-            );
-        } else {
-            $this->_window = $app;
-        }//end if
-
-        $this->_browserid = $browser;
-
-        $this->addCacheVar($this->_window);
-
-        // Resize the browser.
-        $this->resize();
-
-        // Reset zoom.
-        $this->keyDown('Key.CMD + 0');
-
-    }//end _setBrowser()
+    }//end _getAppName()
 
 
     /**
@@ -834,6 +881,82 @@ class PHPSikuliBrowser extends PHPSikuli
 
 
     /**
+     * Set the default browser window size.
+     *
+     * @param integer $x The X position.
+     * @param integer $y The Y position.
+     *
+     * @return void
+     */
+    public function setPosition($x, $y)
+    {
+        $this->_defaultWindowPosition = array(
+                                         'x' => $x,
+                                         'y' => $y,
+                                        );
+
+    }//end setPosition()
+
+
+    /**
+     * Position the browser window.
+     *
+     * @param integer $x The X position.
+     * @param integer $y The Y position.
+     *
+     * @return void
+     */
+    public function position($x=NULL, $y=NULL)
+    {
+        if ($x === NULL || $y === NULL) {
+            $pos = $this->_defaultWindowPosition;
+            if ($pos === NULL) {
+                return;
+            }
+
+            if ($x === NULL) {
+                $x = $pos['x'];
+            }
+
+            if ($y === NULL) {
+                $y = $pos['y'];
+            }
+        }//end if
+
+        $window   = $this->getBrowserWindow();
+        $topLeft  = $this->getTopLeft($window);
+        $topRight = $this->getTopRight($window);
+
+        $yOffset = 5;
+        $xOffset = ($this->getX($topRight) - $this->getX($topLeft) - 250);
+
+        $start = $this->createLocation(
+            $this->getX($topLeft) + $xOffset,
+            $this->getY($topLeft) + $yOffset
+        );
+
+        $endX = $x + $xOffset;
+        $endY = $y + $yOffset;
+        $end = $this->createLocation(
+            $endX,
+            $endY
+        );
+
+        $this->dragDrop($start, $end);
+
+        $size = $this->getWindowSize();
+
+        $this->removeCacheVar($this->_window);
+        $this->_window = $this->_getBrowserWindow($this->_browserid);
+        $this->addCacheVar($this->_window);
+
+        // Set the default region of the find operations.
+        $this->setDefaultRegion($this->_window);
+
+    }//end position()
+
+
+    /**
      * Resizes the browser window.
      *
      * @param integer $w The width of the window.
@@ -1003,6 +1126,14 @@ class PHPSikuliBrowser extends PHPSikuli
     {
         foreach ($settings as $setting => $value) {
             switch ($setting) {
+                case 'fileGroupOwner':
+                    $this->setFileGroup($value);
+                break;
+
+                case 'position':
+                    $this->setPosition($value['x'], $value['y']);
+                break;
+
                 case 'size':
                     if (is_array($value) === TRUE
                         && isset($value['width']) === TRUE
@@ -1010,10 +1141,6 @@ class PHPSikuliBrowser extends PHPSikuli
                     ) {
                         $this->setDefaultWindowSize($value['width'], $value['height']);
                     }
-                break;
-
-                case 'fileGroupOwner':
-                    $this->setFileGroup($value);
                 break;
             }
         }
