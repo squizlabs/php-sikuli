@@ -578,6 +578,7 @@ class PHPSikuliBrowser extends PHPSikuli
         $appName = $this->_getAppName($browser);
         if ($this->getOS() === 'windows') {
             $this->closeBrowser($appName);
+            $this->switchApp($appName);
         } else {
             $this->restartBrowser($appName);
         }
@@ -612,7 +613,14 @@ class PHPSikuliBrowser extends PHPSikuli
         $appName = $this->_getAppName($browser);
 
         $win = null;
-        $app = $this->switchApp($appName);
+        $app = null;
+
+        if ($this->getOS() === 'windows') {
+            $app = $this->callFunc('App.focusedWindow', array(), NULL, TRUE);
+        } else {
+            $app = $this->switchApp($appName);
+        }
+
         if ($this->getOS() !== 'windows') {
             $windowNum = 0;
             switch ($appName) {
@@ -931,8 +939,8 @@ class PHPSikuliBrowser extends PHPSikuli
         $xOffset = ($this->getX($topRight) - $this->getX($topLeft) - 250);
 
         $start = $this->createLocation(
-            $this->getX($topLeft) + $xOffset,
-            $this->getY($topLeft) + $yOffset
+            ($this->getX($topLeft) + $xOffset),
+            ($this->getY($topLeft) + $yOffset + 10)
         );
 
         $endX = $x + $xOffset;
