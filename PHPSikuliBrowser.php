@@ -933,10 +933,14 @@ class PHPSikuliBrowser extends PHPSikuli
 
         $window   = $this->getBrowserWindow();
         $topLeft  = $this->getTopLeft($window);
-        $topRight = $this->getTopRight($window);
 
-        $yOffset = 5;
-        $xOffset = ($this->getX($topRight) - $this->getX($topLeft) - 250);
+        if ($this->getX($topLeft) === $x && ($this->getY($topLeft) + 10) === $y) {
+            return;
+        }
+
+        $topRight = $this->getTopRight($window);
+        $yOffset  = 5;
+        $xOffset  = ($this->getX($topRight) - $this->getX($topLeft) - 250);
 
         $start = $this->createLocation(
             ($this->getX($topLeft) + $xOffset),
