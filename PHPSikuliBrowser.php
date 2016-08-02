@@ -96,6 +96,13 @@ class PHPSikuliBrowser extends PHPSikuli
      */
     private $_defaultWindowPosition = NULL;
 
+    /**
+     * Setting to keep the browser open.
+     *
+     * @var boolean
+     */
+    private $_keepOpen = TRUE;
+
 
     /**
      * Constructor.
@@ -358,12 +365,14 @@ class PHPSikuliBrowser extends PHPSikuli
     {
         $this->debug('ExecJS: '.$js);
 
+        $jsResultPath = $this->_tmpDir.'/jsres.tmp';
+
         clearstatcache();
-        if (file_exists($this->_tmpDir.'/jsres.tmp') === TRUE) {
-            unlink($this->_tmpDir.'/jsres.tmp');
+        if (file_exists($jsResultPath) === TRUE) {
+            unlink($jsResultPath);
         }
 
-        $maxTry = 10;
+        $maxTry = 20;
         do {
             if (file_put_contents($this->_tmpDir.'/jsexec.tmp', $js, LOCK_EX) !== FALSE) {
                 break;
@@ -384,7 +393,7 @@ class PHPSikuliBrowser extends PHPSikuli
 
         $startTime = microtime(TRUE);
         $timeout   = 3;
-        while (file_exists($this->_tmpDir.'/jsres.tmp') === FALSE) {
+        while (file_exists($jsResultPath) === FALSE) {
             if ((microtime(TRUE) - $startTime) > $timeout) {
                 throw new Exception('Browser is not responding!');
             }
@@ -392,8 +401,8 @@ class PHPSikuliBrowser extends PHPSikuli
             usleep(50000);
         }
 
-        $result = file_get_contents($this->_tmpDir.'/jsres.tmp');
-        unlink($this->_tmpDir.'/jsres.tmp');
+        $result = file_get_contents($jsResultPath);
+        unlink($jsResultPath);
 
         if ($result === 'undefined' || trim($result) === '') {
             return NULL;
@@ -697,6 +706,10 @@ class PHPSikuliBrowser extends PHPSikuli
      */
     public function closeBrowser($browserid=NULL)
     {
+        if ($this->_keepOpen === TRUE) {
+            return;
+        }
+
         switch ($this->getOS()) {
             case 'osx':
                 // Shutdown browser.
@@ -1153,6 +1166,10 @@ class PHPSikuliBrowser extends PHPSikuli
                     ) {
                         $this->setDefaultWindowSize($value['width'], $value['height']);
                     }
+                break;
+
+                case 'keepOpen':
+                    $this->_keepOpen = $value;
                 break;
             }
         }
